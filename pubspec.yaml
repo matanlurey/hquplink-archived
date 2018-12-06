@@ -1,0 +1,23 @@
+name: hquplink
+description: 'A free app and resource for the Star Wars: Legion community'
+version: 0.1.0-alpha
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+  async: ^2.0.8
+  cupertino_icons: ^0.1.2
+  flutter:
+    sdk: flutter
+  swlegion:
+    git: https://github.com/hquplink/swlegion
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  assets:
+    - assets/
+  uses-material-design: true
