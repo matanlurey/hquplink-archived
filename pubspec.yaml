@@ -8,8 +8,10 @@ environment:
 dependencies:
   async: ^2.0.8
   cupertino_icons: ^0.1.2
+  firebase_auth: ^0.6.6
   flutter:
     sdk: flutter
+  google_sign_in: ^3.2.4
   swlegion:
     git: https://github.com/hquplink/swlegion
 

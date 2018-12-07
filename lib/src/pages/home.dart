@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'browse.dart';
+import 'profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage();
@@ -24,7 +25,7 @@ class _HomeState extends State<HomePage> {
     _HomeTab(
       icon: const Icon(Icons.person),
       title: const Text('Profile'),
-      build: (_) => const Center(child: Text('Profile')),
+      build: (_) => const ProfilePage(),
     ),
   ];
 

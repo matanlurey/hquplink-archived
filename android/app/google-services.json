@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "714868893711",
+    "firebase_url": "https://hquplink.firebaseio.com",
+    "project_id": "hquplink",
+    "storage_bucket": "hquplink.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714868893711:android:09a7671f1e7a8c80",
+        "android_client_info": {
+          "package_name": "com.hquplink.hquplink"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714868893711-kicnvgqdqrp09kskeb9mgmglrtip17n8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hquplink.hquplink",
+            "certificate_hash": "8aa7cccc456980ae50767d00c1b772e902a6aa79"
+          }
+        },
+        {
+          "client_id": "714868893711-o2v1ftbthu1ticq4hosed095jqmj7qee.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEirFlSOrP6_5e_9Y63DYAt8DLoI5DUTg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714868893711-o2v1ftbthu1ticq4hosed095jqmj7qee.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "714868893711-bm4bmv87hdvnm9h00uhivuglka6g00pm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hquplink.app"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -123,19 +123,30 @@ class BrowseUnitsPage extends StatelessWidget {
                 color: unit.faction == Faction.lightSide ? Colors.red : null,
               ),
               title: Text(unit.name),
-              trailing: Text(
-                {
-                  Rank.commander: 'CMD',
-                  Rank.corps: 'COR',
-                  Rank.heavy: 'HVY',
-                  Rank.operative: 'OPT',
-                  Rank.specialForces: 'SPF',
-                  Rank.support: 'SUP',
-                }[unit.rank],
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontSize: 10.0,
-                ),
+              trailing: Column(
+                children: [
+                  Text(
+                    {
+                      Rank.commander: 'Commander',
+                      Rank.corps: 'Corps',
+                      Rank.heavy: 'Heavy',
+                      Rank.operative: 'Operative',
+                      Rank.specialForces: 'Special Forces',
+                      Rank.support: 'Support',
+                    }[unit.rank],
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 10,
+                    ),
+                  ),
+                  Text(
+                    '${unit.points} Points',
+                    style: const TextStyle(
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+                crossAxisAlignment: CrossAxisAlignment.end,
               ),
               subtitle: unit.subTitle != null ? Text(unit.subTitle) : null,
             );
