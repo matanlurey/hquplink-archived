@@ -20,8 +20,21 @@ class ProfilePage extends StatelessWidget {
       child: RaisedButton(
         child: const Text('Sign In with Google'),
         onPressed: () async {
-          // TODO: Add try/catch?
-          await auth.signIn();
+          try {
+            await auth.signIn();
+          } on Exception catch (e) {
+            await showDialog<void>(
+              context: context,
+              builder: (_) {
+                return SimpleDialog(
+                  title: const Text('Error'),
+                  children: [
+                    Text('$e'),
+                  ],
+                );
+              },
+            );
+          }
         },
       ),
     );
