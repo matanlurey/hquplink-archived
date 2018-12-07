@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'pages/browse.dart';
 import 'pages/home.dart';
 
 final homePage = Route._(
@@ -7,14 +8,24 @@ final homePage = Route._(
   build: (_) => const HomePage(),
 );
 
+final browseKeywordsPage = Route._(
+  name: '/browse/keywords',
+  build: (_) => const BrowseKeywordsPage(),
+);
+
 final browseUnitsPage = Route._(
   name: '/browse/units',
-  build: (_) => const _MissingPage(),
+  build: (_) => const BrowseUnitsPage(),
+);
+
+final browseUpgradesPage = Route._(
+  name: '/browse/upgrades',
+  build: (_) => const BrowseUpgradesPage(),
 );
 
 final browseWeaponsPage = Route._(
   name: '/browse/weapons',
-  build: (_) => const _MissingPage(),
+  build: (_) => const BrowseWeaponsPage(),
 );
 
 class Route {
@@ -25,11 +36,4 @@ class Route {
     @required this.name,
     @required this.build,
   });
-}
-
-class _MissingPage extends StatelessWidget {
-  const _MissingPage();
-
-  @override
-  build(_) => const Center(child: Text('404'));
 }

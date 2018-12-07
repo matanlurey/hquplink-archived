@@ -30,6 +30,8 @@ class App extends StatelessWidget {
         ),
         routes: {
           homePage.name: homePage.build,
+          browseKeywordsPage.name: browseKeywordsPage.build,
+          browseUpgradesPage.name: browseUpgradesPage.build,
           browseUnitsPage.name: browseUnitsPage.build,
           browseWeaponsPage.name: browseWeaponsPage.build,
         },

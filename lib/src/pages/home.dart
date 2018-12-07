@@ -24,7 +24,7 @@ class _HomeState extends State<HomePage> {
     _HomeTab(
       icon: const Icon(Icons.person),
       title: const Text('Profile'),
-      build: (_) => const Center(child: Text('Build')),
+      build: (_) => const Center(child: Text('Profile')),
     ),
   ];
 
