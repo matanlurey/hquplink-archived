@@ -20,6 +20,9 @@ class Catalog {
   /// Units in the catalog.
   final List<Unit> units;
 
+  /// Upgrades in the catalog.
+  final List<Upgrade> upgrades;
+
   /// Weapons in the catalog.
   final List<Weapon> weapons;
 
@@ -30,6 +33,7 @@ class Catalog {
 
   const Catalog({
     @required this.units,
+    @required this.upgrades,
     @required this.weapons,
     @required this.version,
   });
