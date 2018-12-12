@@ -62,14 +62,14 @@ class BrowseKeywordsPage extends StatelessWidget {
   build(context) {
     final keywords = Keyword.values.toList()
       ..sort((a, b) => a.name.compareTo(b.name));
-    final dividerColor = Theme.of(context).dividerColor;
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Units'),
       ),
       body: ListView(
         children: ListTile.divideTiles(
-          color: dividerColor,
+          color: theme.dividerColor,
           tiles: keywords.map((keyword) {
             return ListTile(
               title: _renderName(keyword.name),
@@ -106,14 +106,14 @@ class BrowseUnitsPage extends StatelessWidget {
   @override
   build(context) {
     final catalog = Catalog.of(context);
-    final dividerColor = Theme.of(context).dividerColor;
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Units'),
       ),
       body: ListView(
         children: ListTile.divideTiles(
-          color: dividerColor,
+          color: theme.dividerColor,
           tiles: catalog.units.map((unit) {
             return ListTile(
               leading: Image.asset(
@@ -122,7 +122,10 @@ class BrowseUnitsPage extends StatelessWidget {
                 height: 24,
                 color: unit.faction == Faction.lightSide ? Colors.red : null,
               ),
-              title: Text(unit.name),
+              title: Text(
+                unit.name,
+                overflow: TextOverflow.ellipsis,
+              ),
               trailing: Column(
                 children: [
                   Text(
@@ -148,7 +151,12 @@ class BrowseUnitsPage extends StatelessWidget {
                 ],
                 crossAxisAlignment: CrossAxisAlignment.end,
               ),
-              subtitle: unit.subTitle != null ? Text(unit.subTitle) : null,
+              subtitle: unit.subTitle != null
+                  ? Text(
+                      unit.subTitle,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : null,
             );
           }),
         ).toList(),
@@ -195,7 +203,10 @@ class BrowseWeaponsPage extends StatelessWidget {
             final pierce = weapon.keywords[Keyword.pierceX];
             final impact = weapon.keywords[Keyword.impactX];
             return ListTile(
-              title: Text(weapon.name),
+              title: Text(
+                weapon.name,
+                overflow: TextOverflow.ellipsis,
+              ),
               leading: _renderDice(weapon.dice),
               trailing: Column(
                 children: [
