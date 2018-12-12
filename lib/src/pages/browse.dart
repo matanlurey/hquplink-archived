@@ -65,7 +65,7 @@ class BrowseKeywordsPage extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Units'),
+        title: const Text('Keywords'),
       ),
       body: ListView(
         children: ListTile.divideTiles(
@@ -129,7 +129,7 @@ class BrowseUnitsPage extends StatelessWidget {
               trailing: Column(
                 children: [
                   Text(
-                    {
+                    const {
                       Rank.commander: 'Commander',
                       Rank.corps: 'Corps',
                       Rank.heavy: 'Heavy',
@@ -170,15 +170,61 @@ class BrowseUpgradesPage extends StatelessWidget {
 
   @override
   build(context) {
-    final dividerColor = Theme.of(context).dividerColor;
+    final catalog = Catalog.of(context);
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Upgrades'),
+        title: const Text('Units'),
       ),
       body: ListView(
         children: ListTile.divideTiles(
-          color: dividerColor,
-          tiles: const [],
+          color: theme.dividerColor,
+          tiles: catalog.upgrades.map((upgrade) {
+            var faction = upgrade.restrictedToFaction;
+            faction ??= upgrade.restrictedToUnit?.faction;
+            return ListTile(
+              leading: faction != null ? Image.asset(
+                'assets/faction.${faction.name}.png',
+                width: 24,
+                height: 24,
+                color: faction == Faction.lightSide ? Colors.red : null,
+              ) : const SizedBox(width: 24, height: 24),
+              title: Text(
+                upgrade.name,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: Column(
+                children: [
+                  Text(
+                    const {
+                      UpgradeSlot.command: 'Command',
+                      UpgradeSlot.comms: 'Comms',
+                      UpgradeSlot.elite: 'Elite',
+                      UpgradeSlot.force: 'Force',
+                      UpgradeSlot.gear: 'Gear',
+                      UpgradeSlot.generator: 'Generator',
+                      UpgradeSlot.grenades: 'Grenades',
+                      UpgradeSlot.hardPoint: 'Hard Point',
+                      UpgradeSlot.heavyWeapon: 'Heavy Weapon',
+                      UpgradeSlot.personnel: 'Personnel',
+                      UpgradeSlot.pilot: 'Pilot',
+                    }[upgrade.type],
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 10,
+                    ),
+                  ),
+                  Text(
+                    '${upgrade.points} Points',
+                    style: const TextStyle(
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+                crossAxisAlignment: CrossAxisAlignment.end,
+              ),
+            );
+          }),
         ).toList(),
       ),
     );

@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
 
 import 'pages/browse.dart';
-import 'pages/home.dart';
+import 'pages/table.dart';
 
-final homePage = Route._(
+final tablePage = Route._(
   name: '/',
-  build: (_) => const HomePage(),
+  build: (_) => const TablePage(),
 );
 
 final browseKeywordsPage = Route._(

@@ -3,26 +3,26 @@ import 'package:flutter/material.dart';
 import 'browse.dart';
 import 'profile.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage();
+class TablePage extends StatefulWidget {
+  const TablePage();
 
   @override
-  createState() => _HomeState();
+  createState() => TableState();
 }
 
-class _HomeState extends State<HomePage> {
+class TableState extends State<TablePage> {
   static final _tabs = [
-    _HomeTab(
-      icon: const Icon(Icons.home),
-      title: const Text('Home'),
-      build: (_) => const Center(child: Text('Home')),
+    _Tab(
+      icon: const Icon(Icons.tablet),
+      title: const Text('Table'),
+      build: (_) => const Center(child: Text('Table')),
     ),
-    _HomeTab(
+    _Tab(
       icon: const Icon(Icons.library_books),
       title: const Text('Browse'),
       build: (_) => const BrowsePage(),
     ),
-    _HomeTab(
+    _Tab(
       icon: const Icon(Icons.person),
       title: const Text('Profile'),
       build: (_) => const ProfilePage(),
@@ -57,12 +57,12 @@ class _HomeState extends State<HomePage> {
   }
 }
 
-class _HomeTab {
+class _Tab {
   final Widget title;
   final Widget icon;
   final WidgetBuilder build;
 
-  const _HomeTab({
+  const _Tab({
     @required this.title,
     @required this.icon,
     @required this.build,
