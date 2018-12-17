@@ -100,66 +100,6 @@ class BrowseKeywordsPage extends StatelessWidget {
   }
 }
 
-class BrowseUnitsPage extends StatelessWidget {
-  const BrowseUnitsPage();
-
-  @override
-  build(context) {
-    final catalog = Catalog.of(context);
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Units'),
-      ),
-      body: ListView(
-        children: ListTile.divideTiles(
-          color: theme.dividerColor,
-          tiles: catalog.units.map((unit) {
-            return ListTile(
-              leading: Image.asset('assets/cards/stormtroopers.png'),
-              title: Text(
-                unit.name,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: Column(
-                children: [
-                  Text(
-                    const {
-                      Rank.commander: 'Commander',
-                      Rank.corps: 'Corps',
-                      Rank.heavy: 'Heavy',
-                      Rank.operative: 'Operative',
-                      Rank.specialForces: 'Special Forces',
-                      Rank.support: 'Support',
-                    }[unit.rank],
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 10,
-                    ),
-                  ),
-                  Text(
-                    '${unit.points} Points',
-                    style: const TextStyle(
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-                crossAxisAlignment: CrossAxisAlignment.end,
-              ),
-              subtitle: unit.subTitle != null
-                  ? Text(
-                      unit.subTitle,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  : null,
-            );
-          }),
-        ).toList(),
-      ),
-    );
-  }
-}
-
 class BrowseUpgradesPage extends StatelessWidget {
   const BrowseUpgradesPage();
 
