@@ -116,12 +116,7 @@ class BrowseUnitsPage extends StatelessWidget {
           color: theme.dividerColor,
           tiles: catalog.units.map((unit) {
             return ListTile(
-              leading: Image.asset(
-                'assets/faction.${unit.faction.name}.png',
-                width: 24,
-                height: 24,
-                color: unit.faction == Faction.lightSide ? Colors.red : null,
-              ),
+              leading: Image.asset('assets/cards/stormtroopers.png'),
               title: Text(
                 unit.name,
                 overflow: TextOverflow.ellipsis,
@@ -183,12 +178,14 @@ class BrowseUpgradesPage extends StatelessWidget {
             var faction = upgrade.restrictedToFaction;
             faction ??= upgrade.restrictedToUnit?.faction;
             return ListTile(
-              leading: faction != null ? Image.asset(
-                'assets/faction.${faction.name}.png',
-                width: 24,
-                height: 24,
-                color: faction == Faction.lightSide ? Colors.red : null,
-              ) : const SizedBox(width: 24, height: 24),
+              leading: faction != null
+                  ? Image.asset(
+                      'assets/faction.${faction.name}.png',
+                      width: 24,
+                      height: 24,
+                      color: faction == Faction.lightSide ? Colors.red : null,
+                    )
+                  : const SizedBox(width: 24, height: 24),
               title: Text(
                 upgrade.name,
                 overflow: TextOverflow.ellipsis,
