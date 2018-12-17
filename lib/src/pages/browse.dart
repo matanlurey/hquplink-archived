@@ -178,12 +178,14 @@ class BrowseUpgradesPage extends StatelessWidget {
             var faction = upgrade.restrictedToFaction;
             faction ??= upgrade.restrictedToUnit?.faction;
             return ListTile(
-              leading: faction != null ? Image.asset(
-                'assets/faction.${faction.name}.png',
-                width: 24,
-                height: 24,
-                color: faction == Faction.lightSide ? Colors.red : null,
-              ) : const SizedBox(width: 24, height: 24),
+              leading: faction != null
+                  ? Image.asset(
+                      'assets/faction.${faction.name}.png',
+                      width: 24,
+                      height: 24,
+                      color: faction == Faction.lightSide ? Colors.red : null,
+                    )
+                  : const SizedBox(width: 24, height: 24),
               title: Text(
                 upgrade.name,
                 overflow: TextOverflow.ellipsis,

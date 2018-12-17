@@ -2,38 +2,61 @@ import 'package:flutter/widgets.dart';
 
 import 'pages/browse.dart' hide BrowseUnitsPage;
 import 'pages/browse_units.dart';
+import 'pages/details_units.dart';
 import 'pages/table.dart';
 
-final tablePage = Route._(
+import 'services/catalog.dart';
+
+final tablePage = StaticRoute._(
   name: '/',
   build: (_) => const TablePage(),
 );
 
-final browseKeywordsPage = Route._(
+final browseKeywordsPage = StaticRoute._(
   name: '/browse/keywords',
   build: (_) => const BrowseKeywordsPage(),
 );
 
-final browseUnitsPage = Route._(
+final browseUnitsPage = StaticRoute._(
   name: '/browse/units',
   build: (_) => const BrowseUnitsPage(),
 );
 
-final browseUpgradesPage = Route._(
+final browseUpgradesPage = StaticRoute._(
   name: '/browse/upgrades',
   build: (_) => const BrowseUpgradesPage(),
 );
 
-final browseWeaponsPage = Route._(
+final browseWeaponsPage = StaticRoute._(
   name: '/browse/weapons',
   build: (_) => const BrowseWeaponsPage(),
 );
 
-class Route {
+class StaticRoute {
   final String name;
   final WidgetBuilder build;
 
-  const Route._({
+  const StaticRoute._({
+    @required this.name,
+    @required this.build,
+  });
+}
+
+final detailsUnitsPage = DynamicRoute._(
+  name: '/details/units',
+  build: (context, route) {
+    final catalog = Catalog.of(context);
+    final id = route.name.split('/').last;
+    final unit = catalog.units.singleWhere((u) => u.id == id);
+    return DetailsUnitPage(unit);
+  },
+);
+
+class DynamicRoute {
+  final String name;
+  final Widget Function(BuildContext, RouteSettings) build;
+
+  const DynamicRoute._({
     @required this.name,
     @required this.build,
   });

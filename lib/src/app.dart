@@ -70,6 +70,22 @@ class App extends StatelessWidget {
               browseUnitsPage.name: browseUnitsPage.build,
               browseWeaponsPage.name: browseWeaponsPage.build,
             },
+            onGenerateRoute: (route) {
+              final useRoute = [
+                detailsUnitsPage,
+              ].firstWhere(
+                (r) => route.name.startsWith(r.name),
+                orElse: () => null,
+              );
+              if (useRoute != null) {
+                return MaterialPageRoute<void>(
+                  builder: (context) {
+                    return useRoute.build(context, route);
+                  },
+                );
+              }
+            },
+            debugShowCheckedModeBanner: false,
           ),
         ),
       ),
