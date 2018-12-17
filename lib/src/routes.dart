@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import 'pages/browse.dart';
+import 'pages/browse.dart' hide BrowseUnitsPage;
+import 'pages/browse_units.dart';
 import 'pages/table.dart';
 
 final tablePage = Route._(
