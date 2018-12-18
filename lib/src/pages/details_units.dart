@@ -1,5 +1,6 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:hquplink/common.dart';
 import 'package:swlegion/swlegion.dart';
 
 class DetailsUnitPage extends StatelessWidget {
@@ -16,22 +17,41 @@ class DetailsUnitPage extends StatelessWidget {
     final factionColor = unit.faction == Faction.lightSide
         ? _lightSidePrimary
         : _darkSidePrimary;
+    final categories = [
+      _DetailCategory(
+        title: 'Details',
+        children: [
+          _DetailUnitDetails(unit),
+        ],
+      ),
+      _DetailCategory(
+        title: 'Upgrades',
+        children: [
+          _DetailUnitSlots(unit.upgrades),
+        ],
+      ),
+    ];
+    if (unit.keywords.isNotEmpty) {
+      categories.add(_DetailCategory(
+        title: 'Keywords',
+        children: [
+          _DetailUnitKeywords(unit.keywords),
+        ],
+      ));
+    }
+    if (unit.weapons.isNotEmpty) {
+      categories.add(_DetailCategory(
+        title: 'Weapons',
+        children: [
+          _DetailUnitWeapons(unit.weapons),
+        ],
+      ));
+    }
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             pinned: true,
-            actions: [
-              IconButton(
-                icon: Icon(
-                  Icons.add_box,
-                  color: theme.primaryColorLight,
-                ),
-                onPressed: () {
-                  // TODO: Do something.
-                },
-              )
-            ],
             expandedHeight: 128,
             backgroundColor: factionColor,
             flexibleSpace: FlexibleSpaceBar(
@@ -70,25 +90,7 @@ class DetailsUnitPage extends StatelessWidget {
             ),
           ),
           SliverList(
-            delegate: SliverChildListDelegate([
-              _DetailCategory(
-                title: 'Statistics',
-                children: [
-                  _DetailUnitStats(unit),
-                ],
-              ),
-              _DetailCategory(
-                title: 'Upgrade Slots',
-                children: [
-                  _DetailUnitSlots(unit.upgrades),
-                ],
-              ),
-              // TODO: Fill in.
-              const _DetailCategory(
-                title: 'Weapons',
-                children: [],
-              ),
-            ]),
+            delegate: SliverChildListDelegate(categories),
           ),
         ],
       ),
@@ -125,10 +127,14 @@ class _DetailCategory extends StatelessWidget {
             children: [
               Expanded(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.headline,
+                    Padding(
+                      child: Text(
+                        title,
+                        style: theme.textTheme.title,
+                      ),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 0, 8),
                     )
                   ]..addAll(children),
                 ),
@@ -141,14 +147,14 @@ class _DetailCategory extends StatelessWidget {
   }
 }
 
-class _DetailUnitStats extends StatelessWidget {
+class _DetailUnitDetails extends StatelessWidget {
   static String _capitalize(String input) {
     return input[0].toUpperCase() + input.substring(1);
   }
 
   final Unit unit;
 
-  const _DetailUnitStats(
+  const _DetailUnitDetails(
     this.unit,
   );
 
@@ -157,11 +163,11 @@ class _DetailUnitStats extends StatelessWidget {
     final children = [
       _DetailUnitPair(
         name: 'Type',
-        value: _capitalize(unit.type.name),
+        value: camelToTitleCase(unit.type.name),
       ),
       _DetailUnitPair(
         name: 'Rank',
-        value: _capitalize(unit.rank.name),
+        value: camelToTitleCase(unit.rank.name),
       ),
       _DetailUnitPair(
         name: 'Points',
@@ -199,12 +205,16 @@ class _DetailUnitStats extends StatelessWidget {
             : 'None',
       ),
       _DetailUnitPair(
-        name: 'Defense Surge',
-        value: unit.hasDefenseSurge ? 'Yes' : 'No',
-      ),
-      _DetailUnitPair(
         name: 'Speed',
         value: '${unit.speed}',
+      ),
+      _DetailUnitPair(
+        name: 'Defense Dice',
+        value: camelToTitleCase(unit.defense.name),
+      ),
+      _DetailUnitPair(
+        name: 'Defense Surge',
+        value: unit.hasDefenseSurge ? 'Yes' : 'No',
       ),
     ]);
     return Column(
@@ -214,10 +224,6 @@ class _DetailUnitStats extends StatelessWidget {
 }
 
 class _DetailUnitSlots extends StatelessWidget {
-  static String _capitalize(String input) {
-    return input[0].toUpperCase() + input.substring(1);
-  }
-
   final BuiltMap<UpgradeSlot, int> upgrades;
 
   const _DetailUnitSlots(
@@ -229,8 +235,109 @@ class _DetailUnitSlots extends StatelessWidget {
     return Column(
       children: upgrades.entries.map((slot) {
         return _DetailUnitPair(
-          name: _capitalize(slot.key.name),
+          name: camelToTitleCase(slot.key.name),
           value: '${slot.value}',
+        );
+      }).toList(),
+    );
+  }
+}
+
+String _keywordToText(MapEntry<Keyword, String> word) {
+  final value = camelToTitleCase(word.key.name);
+  if (value.endsWith(' X')) {
+    return '${value.substring(0, value.length - 2)} ${word.value}';
+  }
+  return value;
+}
+
+class _DetailUnitKeywords extends StatelessWidget {
+  final BuiltMap<Keyword, String> keywords;
+
+  const _DetailUnitKeywords(
+    this.keywords,
+  );
+
+  @override
+  build(context) {
+    final theme = Theme.of(context);
+    return Column(
+      children: keywords.entries.map((word) {
+        return Padding(
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text(_keywordToText(word)),
+                ],
+              ),
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      word.key.description,
+                      style: theme.textTheme.caption,
+                      softWrap: true,
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _DetailUnitWeapons extends StatelessWidget {
+  final BuiltSet<Weapon> weapons;
+
+  const _DetailUnitWeapons(this.weapons);
+
+  @override
+  build(context) {
+    final theme = Theme.of(context);
+    return Column(
+      children: weapons.map((weapon) {
+        final diceText = weapon.dice.entries.map((dice) {
+          final name = dice.key.name[0].toUpperCase();
+          return TextSpan(
+            children: [
+              TextSpan(
+                text: '$name ',
+                style: TextStyle(
+                  color: theme.textTheme.caption.color,
+                ),
+              ),
+              TextSpan(
+                text: '${dice.value} ',
+              ),
+            ],
+          );
+        });
+        return ListTile(
+          title: Text(weapon.name),
+          subtitle: weapon.keywords.isEmpty
+              ? null
+              : Text(weapon.keywords.entries.map(_keywordToText).join(', ')),
+          leading: Text(
+            weapon.maxRange == 0
+                ? 'Melee'
+                : '${weapon.minRange} - ${weapon.maxRange}',
+            style: TextStyle(
+              color: theme.textTheme.caption.color,
+            ),
+          ),
+          trailing: Text.rich(
+            TextSpan(
+              children: diceText.toList(),
+            ),
+          ),
         );
       }).toList(),
     );

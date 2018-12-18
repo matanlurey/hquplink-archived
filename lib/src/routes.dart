@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'pages/browse.dart' hide BrowseUnitsPage;
+import 'pages/browse.dart';
 import 'pages/browse_units.dart';
 import 'pages/details_units.dart';
 import 'pages/table.dart';

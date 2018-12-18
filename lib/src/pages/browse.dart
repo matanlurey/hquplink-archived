@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:hquplink/common.dart';
 import 'package:swlegion/swlegion.dart';
 
 import '../routes.dart';
@@ -72,88 +73,10 @@ class BrowseKeywordsPage extends StatelessWidget {
           color: theme.dividerColor,
           tiles: keywords.map((keyword) {
             return ListTile(
-              title: _renderName(keyword.name),
+              title: Text(camelToTitleCase(keyword.name)),
               subtitle: Text(keyword.description),
             );
           }).toList(),
-        ).toList(),
-      ),
-    );
-  }
-
-  static Widget _renderName(String name) {
-    bool isCapital(int character) => character < 97;
-    final buffer = StringBuffer();
-    for (var i = 0; i < name.length; i++) {
-      final character = name.codeUnitAt(i);
-      if (isCapital(character)) {
-        buffer..write(' ')..write(String.fromCharCode(character));
-      } else {
-        var letter = String.fromCharCode(character);
-        if (i == 0) {
-          letter = letter.toUpperCase();
-        }
-        buffer.write(letter);
-      }
-    }
-    return Text(buffer.toString());
-  }
-}
-
-class BrowseUnitsPage extends StatelessWidget {
-  const BrowseUnitsPage();
-
-  @override
-  build(context) {
-    final catalog = Catalog.of(context);
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Units'),
-      ),
-      body: ListView(
-        children: ListTile.divideTiles(
-          color: theme.dividerColor,
-          tiles: catalog.units.map((unit) {
-            return ListTile(
-              leading: Image.asset('assets/cards/stormtroopers.png'),
-              title: Text(
-                unit.name,
-                overflow: TextOverflow.ellipsis,
-              ),
-              trailing: Column(
-                children: [
-                  Text(
-                    const {
-                      Rank.commander: 'Commander',
-                      Rank.corps: 'Corps',
-                      Rank.heavy: 'Heavy',
-                      Rank.operative: 'Operative',
-                      Rank.specialForces: 'Special Forces',
-                      Rank.support: 'Support',
-                    }[unit.rank],
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 10,
-                    ),
-                  ),
-                  Text(
-                    '${unit.points} Points',
-                    style: const TextStyle(
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-                crossAxisAlignment: CrossAxisAlignment.end,
-              ),
-              subtitle: unit.subTitle != null
-                  ? Text(
-                      unit.subTitle,
-                      overflow: TextOverflow.ellipsis,
-                    )
-                  : null,
-            );
-          }),
         ).toList(),
       ),
     );
