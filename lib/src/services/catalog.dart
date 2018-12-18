@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 import 'package:swlegion/swlegion.dart';
@@ -43,6 +44,37 @@ class Catalog {
 
   @override
   int get hashCode => version;
+
+  /// Returns whether [upgrade] can be applied to [unit].
+  bool isValidUpgrade(Upgrade upgrade, Unit unit) {
+    if (!unit.upgrades.containsKey(upgrade.type)) {
+      return false;
+    }
+    final restrictedToFaction = upgrade.restrictedToFaction;
+    if (restrictedToFaction != null) {
+      return unit.faction == restrictedToFaction;
+    }
+    final restrictedtoUnit = upgrade.restrictedToUnit;
+    if (restrictedtoUnit.isNotEmpty) {
+      return restrictedtoUnit.contains(unit);
+    }
+    final restrictedToType = upgrade.restrictedToType;
+    if (restrictedToType != null) {
+      return unit.type == restrictedToType;
+    }
+    return true;
+  }
+
+  /// Returns upgrades valid for a given [unit] grouped by [UpgradeSlot].
+  BuiltSetMultimap<UpgradeSlot, Upgrade> validUpgrades(Unit unit) {
+    final results = SetMultimapBuilder<UpgradeSlot, Upgrade>();
+    for (final upgrade in upgrades) {
+      if (isValidUpgrade(upgrade, unit)) {
+        results.add(upgrade.type, upgrade);
+      }
+    }
+    return results.build();
+  }
 }
 
 /// An [InheritedModel] that provides access to the [Catalog].
