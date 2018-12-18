@@ -13,7 +13,6 @@ class DetailsUnitPage extends StatelessWidget {
 
   @override
   build(context) {
-    final theme = Theme.of(context);
     final factionColor = unit.faction == Faction.lightSide
         ? _lightSidePrimary
         : _darkSidePrimary;
@@ -184,7 +183,7 @@ class _DetailUnitDetails extends StatelessWidget {
     ];
     final isVehicle = const [
       UnitType.repulsorVehicle,
-      UnitType.vehicle,
+      UnitType.groundVehicle,
     ].contains(unit.type);
     if (isVehicle) {
       children.add(_DetailUnitPair(
