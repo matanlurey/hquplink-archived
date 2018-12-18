@@ -41,7 +41,7 @@ class WeaponsList extends StatelessWidget {
           leading: Text(
             weapon.maxRange == 0
                 ? 'Melee'
-                : '${weapon.minRange} - ${weapon.maxRange}',
+                : '${weapon.minRange} - ${weapon.maxRange ?? '∞'}',
             style: TextStyle(
               color: theme.textTheme.caption.color,
             ),

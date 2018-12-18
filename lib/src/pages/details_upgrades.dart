@@ -30,19 +30,19 @@ class DetailsUpgradePage extends StatelessWidget {
                 value: Text('${upgrade.points}'),
               ),
               DataPair(
-                title: const Text('Restrictions'),
+                title: const Text('Restriction'),
                 value: Text(upgrade.restrictedToFaction != null
                     ? camelToTitleCase(upgrade.restrictedToFaction.name)
-                    : upgrade.restrictedToUnit != null
-                        ? upgrade.restrictedToUnit.name
+                    : upgrade.restrictedToUnit.isNotEmpty
+                        ? upgrade.restrictedToUnit.first.name
                         : 'None'),
               ),
               DataPair(
-                title: const Text('Exhaustible'),
+                title: const Text('Exhausted On Use'),
                 value: Text(upgrade.isExhaustible ? 'Yes' : 'No'),
               ),
               DataPair(
-                title: const Text('Adds Minis'),
+                title: const Text('Adds Miniature'),
                 value: Text(upgrade.addsMiniature ? 'Yes' : 'No'),
               ),
             ],
@@ -74,7 +74,6 @@ class DetailsUpgradePage extends StatelessWidget {
     if (upgrade.weapon != null) {
       children.add(
         DataPanel(
-          title: const Text('Weapons'),
           body: WeaponsList(weapons: [upgrade.weapon]),
         ),
       );

@@ -50,12 +50,19 @@ class Catalog {
     if (!unit.upgrades.containsKey(upgrade.type)) {
       return false;
     }
-    return upgrade.restrictedToFaction != null
-        ? upgrade.restrictedToFaction == unit.faction
-        : upgrade.restrictedToUnit != null
-            ? upgrade.restrictedToUnit == unit
-            : upgrade.restrictedToType == null ||
-                upgrade.restrictedToType == unit.type;
+    final restrictedToFaction = upgrade.restrictedToFaction;
+    if (restrictedToFaction != null) {
+      return unit.faction == restrictedToFaction;
+    }
+    final restrictedtoUnit = upgrade.restrictedToUnit;
+    if (restrictedtoUnit.isNotEmpty) {
+      return restrictedtoUnit.contains(unit);
+    }
+    final restrictedToType = upgrade.restrictedToType;
+    if (restrictedToType != null) {
+      return unit.type == restrictedToType;
+    }
+    return true;
   }
 
   /// Returns upgrades valid for a given [unit] grouped by [UpgradeSlot].

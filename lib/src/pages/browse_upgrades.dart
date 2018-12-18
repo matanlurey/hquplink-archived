@@ -27,8 +27,8 @@ class BrowseUpgradesPage extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               subtitle: Text(camelToTitleCase(upgrade.type.name)),
-              trailing: upgrade.restrictedToUnit != null
-                  ? UnitAvatar(upgrade.restrictedToUnit)
+              trailing: upgrade.restrictedToUnit.isNotEmpty
+                  ? UnitAvatar(upgrade.restrictedToUnit.first)
                   : upgrade.restrictedToFaction != null
                       ? Image.asset(
                           'assets/faction.${upgrade.restrictedToFaction.name}.png',

@@ -99,7 +99,7 @@ class BrowseUpgradesPage extends StatelessWidget {
           color: theme.dividerColor,
           tiles: catalog.upgrades.map((upgrade) {
             var faction = upgrade.restrictedToFaction;
-            faction ??= upgrade.restrictedToUnit?.faction;
+            faction ??= upgrade.restrictedToUnit?.first?.faction;
             return ListTile(
               leading: faction != null
                   ? Image.asset(
