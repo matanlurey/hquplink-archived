@@ -35,9 +35,9 @@ String abbreviate(String hasUppercaseChars, {int max = 2}) {
 ///
 /// For example, `mapKeyword(Keyword.impactX, '5')` returns `'Impact 5'`.
 String mapKeyword(Keyword keyword, String value) {
-  final value = camelToTitleCase(keyword.name);
-  if (value.endsWith(' X')) {
-    return '${value.substring(0, value.length - 2)} $value';
+  final word = camelToTitleCase(keyword.name);
+  if (word.endsWith(' X')) {
+    return '${word.substring(0, word.length - 2)} $value';
   }
-  return value;
+  return word;
 }
