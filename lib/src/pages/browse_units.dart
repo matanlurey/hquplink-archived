@@ -27,7 +27,9 @@ class BrowseUnitsPage extends StatelessWidget {
               subtitle: unit.subTitle != null ? Text(unit.subTitle) : null,
               onTap: () {
                 Navigator.pushNamed(
-                    context, '${detailsUnitsPage.name}/${unit.id}');
+                  context,
+                  '${detailsUnitsPage.name}/${unit.id}',
+                );
               },
             );
           }).toList(),
