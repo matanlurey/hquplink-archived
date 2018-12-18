@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hquplink/common.dart';
+import 'package:hquplink/widgets.dart';
 import 'package:swlegion/swlegion.dart';
 
 import '../routes.dart';
 import '../services/catalog.dart';
-import '../widgets/unit_avatar.dart';
-import '../widgets/upgrade_avatar.dart';
 
 class BrowseUpgradesPage extends StatelessWidget {
   const BrowseUpgradesPage();

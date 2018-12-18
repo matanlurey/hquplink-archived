@@ -1,7 +1,10 @@
-import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hquplink/common.dart';
+import 'package:hquplink/widgets.dart';
 import 'package:swlegion/swlegion.dart';
+
+import '../routes.dart';
+import '../services/catalog.dart';
 
 class DetailsUnitPage extends StatelessWidget {
   static const _lightSidePrimary = Color(0xFF833C34);
@@ -17,35 +20,37 @@ class DetailsUnitPage extends StatelessWidget {
         ? _lightSidePrimary
         : _darkSidePrimary;
     final categories = [
-      _DetailCategory(
-        title: 'Details',
-        children: [
-          _DetailUnitDetails(unit),
-        ],
+      DataPanel(
+        title: const Text('Details'),
+        body: _DetailUnitDetails(unit),
       ),
-      _DetailCategory(
-        title: 'Upgrades',
-        children: [
-          _DetailUnitSlots(unit.upgrades),
-        ],
+      DataPanel(
+        title: const Text('Upgrades'),
+        body: _DetailUnitSlots(unit),
       ),
     ];
     if (unit.keywords.isNotEmpty) {
-      categories.add(_DetailCategory(
-        title: 'Keywords',
-        children: [
-          _DetailUnitKeywords(unit.keywords),
-        ],
+      categories.add(DataPanel(
+        title: const Text('Keywords'),
+        body: KeywordsList(keywords: unit.keywords),
       ));
     }
     if (unit.weapons.isNotEmpty) {
-      categories.add(_DetailCategory(
-        title: 'Weapons',
-        children: [
-          _DetailUnitWeapons(unit.weapons),
-        ],
+      categories.add(DataPanel(
+        title: const Text('Weapons'),
+        body: WeaponsList(weapons: unit.weapons),
       ));
     }
+    final title = Text(
+      unit.name,
+      textScaleFactor: 0.8,
+    );
+    final subTitle = unit.subTitle != null
+        ? Text(
+            unit.subTitle,
+            textScaleFactor: 0.5,
+          )
+        : null;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -54,11 +59,9 @@ class DetailsUnitPage extends StatelessWidget {
             expandedHeight: 128,
             backgroundColor: factionColor,
             flexibleSpace: FlexibleSpaceBar(
-              title: Container(
-                child: Text(
-                  unit.name,
-                  textScaleFactor: 0.8,
-                ),
+              title: Column(
+                children: subTitle != null ? [title, subTitle] : [title],
+                mainAxisAlignment: MainAxisAlignment.end,
               ),
               background: Stack(
                 children: [
@@ -97,55 +100,6 @@ class DetailsUnitPage extends StatelessWidget {
   }
 }
 
-class _DetailCategory extends StatelessWidget {
-  final List<Widget> children;
-  final String title;
-
-  const _DetailCategory({
-    @required this.children,
-    @required this.title,
-  });
-
-  @override
-  build(context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: theme.dividerColor),
-        ),
-      ),
-      child: DefaultTextStyle(
-        style: theme.textTheme.subhead,
-        child: SafeArea(
-          top: false,
-          bottom: false,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      child: Text(
-                        title,
-                        style: theme.textTheme.title,
-                      ),
-                      padding: const EdgeInsets.fromLTRB(16, 0, 0, 8),
-                    )
-                  ]..addAll(children),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _DetailUnitDetails extends StatelessWidget {
   static String _capitalize(String input) {
     return input[0].toUpperCase() + input.substring(1);
@@ -160,25 +114,25 @@ class _DetailUnitDetails extends StatelessWidget {
   @override
   build(_) {
     final children = [
-      _DetailUnitPair(
-        name: 'Type',
-        value: camelToTitleCase(unit.type.name),
+      DataPair(
+        title: const Text('Type'),
+        value: Text(camelToTitleCase(unit.type.name)),
       ),
-      _DetailUnitPair(
-        name: 'Rank',
-        value: camelToTitleCase(unit.rank.name),
+      DataPair(
+        title: const Text('Rank'),
+        value: Text(camelToTitleCase(unit.rank.name)),
       ),
-      _DetailUnitPair(
-        name: 'Points',
-        value: '${unit.points}',
+      DataPair(
+        title: const Text('Points'),
+        value: Text('${unit.points}'),
       ),
-      _DetailUnitPair(
-        name: 'Miniatures',
-        value: '${unit.miniatures}',
+      DataPair(
+        title: const Text('Miniatures'),
+        value: Text('${unit.miniatures}'),
       ),
-      _DetailUnitPair(
-        name: 'Wounds',
-        value: '${unit.wounds}',
+      DataPair(
+        title: const Text('Miniatures'),
+        value: Text('${unit.wounds}'),
       ),
     ];
     final isVehicle = const [
@@ -186,195 +140,94 @@ class _DetailUnitDetails extends StatelessWidget {
       UnitType.groundVehicle,
     ].contains(unit.type);
     if (isVehicle) {
-      children.add(_DetailUnitPair(
-        name: 'Resilience',
-        value: '${unit.resilience ?? '-'}',
+      children.add(DataPair(
+        title: const Text('Resilience'),
+        value: Text('${unit.resilience ?? '-'}'),
       ));
     } else {
-      children.add(_DetailUnitPair(
-        name: 'Courage',
-        value: '${unit.courage ?? '-'}',
+      children.add(DataPair(
+        title: const Text('Courage'),
+        value: Text('${unit.courage ?? '-'}'),
       ));
     }
     children.addAll([
-      _DetailUnitPair(
-        name: 'Attack Surge',
-        value: unit.attackSurge != null
+      DataPair(
+        title: const Text('Attack Surge'),
+        value: Text(unit.attackSurge != null
             ? _capitalize(unit.attackSurge.name)
-            : 'None',
+            : 'None'),
       ),
-      _DetailUnitPair(
-        name: 'Speed',
-        value: '${unit.speed}',
+      DataPair(
+        title: const Text('Speed'),
+        value: Text('${unit.speed}'),
       ),
-      _DetailUnitPair(
-        name: 'Defense Dice',
-        value: camelToTitleCase(unit.defense.name),
+      DataPair(
+        title: const Text('Defense Dice'),
+        value: Text(camelToTitleCase(unit.defense.name)),
       ),
-      _DetailUnitPair(
-        name: 'Defense Surge',
-        value: unit.hasDefenseSurge ? 'Yes' : 'No',
+      DataPair(
+        title: const Text('Defense Surge'),
+        value: Text(unit.hasDefenseSurge ? 'Yes' : 'No'),
       ),
     ]);
-    return Column(
-      children: children,
+    return Padding(
+      child: GridView.count(
+        padding: const EdgeInsets.all(0),
+        children: children,
+        shrinkWrap: true,
+        primary: false,
+        crossAxisCount: 2,
+        childAspectRatio: 3,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
     );
   }
 }
 
 class _DetailUnitSlots extends StatelessWidget {
-  final BuiltMap<UpgradeSlot, int> upgrades;
+  final Unit unit;
 
   const _DetailUnitSlots(
-    this.upgrades,
+    this.unit,
   );
 
   @override
   build(context) {
+    final catalog = Catalog.of(context);
+    final upgrades = catalog.validUpgrades(unit);
     return Column(
-      children: upgrades.entries.map((slot) {
-        return _DetailUnitPair(
-          name: camelToTitleCase(slot.key.name),
-          value: '${slot.value}',
-        );
-      }).toList(),
-    );
-  }
-}
-
-String _keywordToText(MapEntry<Keyword, String> word) {
-  final value = camelToTitleCase(word.key.name);
-  if (value.endsWith(' X')) {
-    return '${value.substring(0, value.length - 2)} ${word.value}';
-  }
-  return value;
-}
-
-class _DetailUnitKeywords extends StatelessWidget {
-  final BuiltMap<Keyword, String> keywords;
-
-  const _DetailUnitKeywords(
-    this.keywords,
-  );
-
-  @override
-  build(context) {
-    final theme = Theme.of(context);
-    return Column(
-      children: keywords.entries.map((word) {
-        return Padding(
-          child: Column(
+      children: upgrades.toMap().entries.map((entry) {
+        return ExpansionTile(
+          title: Row(
             children: [
-              Row(
-                children: [
-                  Text(_keywordToText(word)),
-                ],
+              Expanded(
+                flex: 2,
+                child: Text(camelToTitleCase(entry.key.name)),
               ),
-              Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      word.key.description,
-                      style: theme.textTheme.caption,
-                      softWrap: true,
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _DetailUnitWeapons extends StatelessWidget {
-  final BuiltSet<Weapon> weapons;
-
-  const _DetailUnitWeapons(this.weapons);
-
-  @override
-  build(context) {
-    final theme = Theme.of(context);
-    return Column(
-      children: weapons.map((weapon) {
-        final diceText = weapon.dice.entries.map((dice) {
-          final name = dice.key.name[0].toUpperCase();
-          return TextSpan(
-            children: [
-              TextSpan(
-                text: '$name ',
-                style: TextStyle(
-                  color: theme.textTheme.caption.color,
+              Expanded(
+                flex: 3,
+                child: Text(
+                  '${unit.upgrades[entry.key]}',
+                  textAlign: TextAlign.end,
                 ),
-              ),
-              TextSpan(
-                text: '${dice.value} ',
-              ),
+              )
             ],
-          );
-        });
-        return ListTile(
-          title: Text(weapon.name),
-          subtitle: weapon.keywords.isEmpty
-              ? null
-              : Text(weapon.keywords.entries.map(_keywordToText).join(', ')),
-          leading: Text(
-            weapon.maxRange == 0
-                ? 'Melee'
-                : '${weapon.minRange} - ${weapon.maxRange}',
-            style: TextStyle(
-              color: theme.textTheme.caption.color,
-            ),
           ),
-          trailing: Text.rich(
-            TextSpan(
-              children: diceText.toList(),
-            ),
-          ),
+          children: entry.value.map((upgrade) {
+            return ListTile(
+              title: InkWell(
+                child: Text(upgrade.name),
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '${detailsUpgradesPage.name}/${upgrade.id}',
+                  );
+                },
+              ),
+            );
+          }).toList(),
         );
       }).toList(),
-    );
-  }
-}
-
-class _DetailUnitPair extends StatelessWidget {
-  final String name;
-  final String value;
-
-  const _DetailUnitPair({
-    @required this.name,
-    @required this.value,
-  });
-
-  @override
-  build(context) {
-    final theme = Theme.of(context);
-    return Container(
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Text(name, style: theme.textTheme.body1),
-            ],
-          ),
-          Row(
-            children: [
-              Text(value, style: theme.textTheme.body2),
-            ],
-          ),
-        ],
-        mainAxisAlignment: MainAxisAlignment.start,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
     );
   }
 }

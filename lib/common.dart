@@ -1,3 +1,5 @@
+import 'package:swlegion/swlegion.dart';
+
 bool _isCapitalized(int character) => character >= 65 && character < 97;
 
 String camelToTitleCase(String camelCased) {
@@ -27,4 +29,15 @@ String abbreviate(String hasUppercaseChars, {int max = 2}) {
   }
   final result = buffer.toString();
   return result.length > max ? result.substring(result.length - max) : result;
+}
+
+/// Returns a [keyword] with the value of `'X'` replaced if necessary.
+///
+/// For example, `mapKeyword(Keyword.impactX, '5')` returns `'Impact 5'`.
+String mapKeyword(Keyword keyword, String value) {
+  final value = camelToTitleCase(keyword.name);
+  if (value.endsWith(' X')) {
+    return '${value.substring(0, value.length - 2)} $value';
+  }
+  return value;
 }

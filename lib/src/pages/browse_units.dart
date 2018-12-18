@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../routes.dart';
 import '../services/catalog.dart';
-import '../widgets/unit_avatar.dart';
+import '../widgets/icons/unit_avatar.dart';
 
 class BrowseUnitsPage extends StatelessWidget {
   const BrowseUnitsPage();
