@@ -85,11 +85,9 @@ class DetailsUpgradePage extends StatelessWidget {
             pinned: true,
             expandedHeight: 128,
             flexibleSpace: FlexibleSpaceBar(
-              title: Container(
-                child: Text(
-                  upgrade.name,
-                  textScaleFactor: 0.8,
-                ),
+              title: Text(
+                upgrade.name,
+                textScaleFactor: 0.7,
               ),
             ),
           ),

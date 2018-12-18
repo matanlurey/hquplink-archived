@@ -54,9 +54,9 @@ class Catalog {
     if (restrictedToFaction != null) {
       return unit.faction == restrictedToFaction;
     }
-    final restrictedtoUnit = upgrade.restrictedToUnit;
-    if (restrictedtoUnit.isNotEmpty) {
-      return restrictedtoUnit.contains(unit);
+    final restrictedToUnit = upgrade.restrictedToUnit;
+    if (restrictedToUnit.isNotEmpty) {
+      return restrictedToUnit.contains(unit);
     }
     final restrictedToType = upgrade.restrictedToType;
     if (restrictedToType != null) {
