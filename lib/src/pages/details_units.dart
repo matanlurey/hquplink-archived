@@ -43,7 +43,7 @@ class DetailsUnitPage extends StatelessWidget {
     }
     final title = Text(
       unit.name,
-      textScaleFactor: 0.8,
+      textScaleFactor: 0.7,
     );
     final subTitle = unit.subTitle != null
         ? Text(
@@ -224,6 +224,8 @@ class _DetailUnitSlots extends StatelessWidget {
                   );
                 },
               ),
+              leading: UpgradeAvatar(upgrade),
+              trailing: Text('${upgrade.points} points'),
             );
           }).toList(),
         );

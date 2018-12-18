@@ -23,4 +23,5 @@ flutter:
   assets:
     - assets/
     - assets/cards/
+    - assets/upgrades/
   uses-material-design: true
