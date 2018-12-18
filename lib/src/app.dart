@@ -73,6 +73,7 @@ class App extends StatelessWidget {
             onGenerateRoute: (route) {
               final useRoute = [
                 detailsUnitsPage,
+                detailsUpgradesPage,
               ].firstWhere(
                 (r) => route.name.startsWith(r.name),
                 orElse: () => null,
