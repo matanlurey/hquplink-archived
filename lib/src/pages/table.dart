@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hquplink/widgets.dart';
 import 'package:swlegion/swlegion.dart';
 
+import '../services/catalog.dart' as services;
 import '../services/table.dart' as services;
 
 import 'browse.dart';
@@ -94,75 +95,57 @@ class _TableView extends StatelessWidget {
     }
     final cards = table.mapElements(
       buildUnit: (unit) {
-        return Row(
-          children: [
-            _UnitCard(unit),
-          ],
-        );
+        return _UnitCard(unit);
       },
     );
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(children: cards.toList()),
+    return ListView(
+      children: cards.toList(),
     );
   }
 }
 
-class _UnitCard extends StatefulWidget {
+class _UnitCard extends StatelessWidget {
   final ArmyUnit unit;
 
   const _UnitCard(this.unit);
 
   @override
-  createState() => _UnitCardState();
-}
-
-// TODO: Animate out when removed.
-class _UnitCardState extends State<_UnitCard> {
-  var isExpanded = false;
-
-  @override
   build(context) {
-    var subtitle = '${widget.unit.unit.points} Points';
-    if (widget.unit.upgrades.isNotEmpty) {
-      subtitle = '$subtitle (${widget.unit.upgrades.length} Upgrades)';
+    final theme = Theme.of(context);
+    var subtitle = '${unit.unit.points} Points';
+    if (unit.upgrades.isNotEmpty) {
+      subtitle = '$subtitle (${unit.upgrades.length} Upgrades)';
     }
-    final children = <Widget>[
-      ListTile(
-        leading: UnitAvatar(widget.unit.unit),
-        title: Text(widget.unit.unit.name),
-        subtitle: Text(subtitle),
-        trailing: IconButton(
-          icon: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
-          onPressed: () {
-            setState(() {
-              isExpanded = !isExpanded;
-            });
-          },
+    return Card(
+      child: ExpansionTile(
+        leading: UnitAvatar(unit.unit),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(unit.unit.name),
+            Text(subtitle, style: theme.textTheme.subtitle),
+          ],
         ),
-      ),
-    ];
-    // TODO: Animate open/closed.
-    if (isExpanded) {
-      final table = services.Table.of(context);
-      children.add(ButtonBar(
-        children: [
-          FlatButton(
-            child: const Text('REMOVE'),
-            onPressed: () {
-              table.removeUnit(widget.unit);
-            },
-          ),
-        ],
-      ));
-    }
-    return Expanded(
-      child: Card(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: children,
+        trailing: PopupMenuButton<_UnitCardOption>(
+          icon: const Icon(Icons.more_vert),
+          onSelected: (_) {
+            services.Table.of(context).removeUnit(unit);
+          },
+          itemBuilder: (context) {
+            return const [
+              PopupMenuItem(
+                value: _UnitCardOption.removeUnit,
+                child: Text('Remove'),
+              )
+            ];
+          },
         ),
       ),
     );
   }
+}
+
+enum _UnitCardOption {
+  removeUnit,
 }
