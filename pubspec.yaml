@@ -12,6 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   google_sign_in: ^3.2.4
+  path: ^1.6.2
+  path_provider: ^0.4.1
+  shared_preferences: ^0.4.3
   swlegion:
     git: https://github.com/hquplink/swlegion
 

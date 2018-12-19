@@ -10,7 +10,8 @@ class UpgradeAvatar extends StatelessWidget {
   @override
   build(context) {
     return CircleAvatar(
-      backgroundImage: AssetImage('assets/upgrades/${upgrade.id.toLowerCase()}.png'),
+      backgroundImage:
+          AssetImage('assets/upgrades/${upgrade.id.toLowerCase()}.png'),
     );
   }
 }
