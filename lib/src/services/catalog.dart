@@ -30,7 +30,7 @@ class Catalog {
   /// Version of the catalog.
   ///
   /// **NOTE**: This is used to determine if updates are necessary!
-  final int version;
+  final String version;
 
   const Catalog({
     @required this.units,
@@ -43,7 +43,7 @@ class Catalog {
   bool operator ==(Object o) => o is Catalog && o.version == version;
 
   @override
-  int get hashCode => version;
+  int get hashCode => version.hashCode;
 
   /// Returns whether [upgrade] can be applied to [unit].
   bool isValidUpgrade(Upgrade upgrade, Unit unit) {

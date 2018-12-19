@@ -3,8 +3,10 @@ import 'package:hquplink/common.dart';
 import 'package:hquplink/widgets.dart';
 import 'package:swlegion/swlegion.dart';
 
+import '../pages/table.dart';
 import '../routes.dart';
-import '../services/catalog.dart';
+import '../services/catalog.dart' as services;
+import '../services/table.dart' as services;
 
 class DetailsUnitPage extends StatelessWidget {
   static const _lightSidePrimary = Color(0xFF833C34);
@@ -46,10 +48,7 @@ class DetailsUnitPage extends StatelessWidget {
       textScaleFactor: 0.7,
     );
     final subTitle = unit.subTitle != null
-        ? Text(
-            unit.subTitle,
-            textScaleFactor: 0.5,
-          )
+        ? Text(unit.subTitle, textScaleFactor: 0.5)
         : null;
     return Scaffold(
       body: CustomScrollView(
@@ -58,6 +57,16 @@ class DetailsUnitPage extends StatelessWidget {
             pinned: true,
             expandedHeight: 128,
             backgroundColor: factionColor,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline),
+                onPressed: () {
+                  services.Table.of(context).appendUnit(unit);
+                  TableState.hackSwitchToTableTab();
+                  Navigator.popUntil(context, (r) => r.isFirst);
+                },
+              )
+            ],
             flexibleSpace: FlexibleSpaceBar(
               title: Column(
                 children: subTitle != null ? [title, subTitle] : [title],
@@ -193,7 +202,7 @@ class _DetailUnitSlots extends StatelessWidget {
 
   @override
   build(context) {
-    final catalog = Catalog.of(context);
+    final catalog = services.Catalog.of(context);
     final upgrades = catalog.validUpgrades(unit);
     return Column(
       children: upgrades.toMap().entries.map((entry) {

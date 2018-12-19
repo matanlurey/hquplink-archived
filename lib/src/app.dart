@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:swlegion/database.dart' as database;
 
@@ -17,10 +19,11 @@ class App extends StatelessWidget {
     weapons: List.unmodifiable(
       database.weapons.toList()..sort((a, b) => a.name.compareTo(b.name)),
     ),
-    version: 1,
+    version: 'BUILT_IN',
   );
 
-  static const _temporaryTable = services.Table(
+  static const _initialTable = services.Table(
+    elements: const [],
     version: 1,
   );
 
@@ -44,10 +47,28 @@ class App extends StatelessWidget {
     );
   }
 
+  static final _loadFromDisk = services.Table.fromDisk();
   static Widget _provideTable(Widget child) {
-    return services.TableModel(
-      table: _temporaryTable,
-      child: child,
+    final controller = StreamController<services.Table>();
+    return FutureBuilder<services.Table>(
+      builder: (context, snapshot) {
+        return StreamBuilder<services.Table>(
+          builder: (context, snapshot) {
+            return services.TableModel(
+              table: snapshot.data,
+              child: child,
+              onUpdate: controller.add,
+            );
+          },
+          initialData: _initialTable,
+          stream: controller.stream,
+        );
+      },
+      initialData: const services.Table(
+        elements: [],
+        version: 1,
+      ),
+      future: _loadFromDisk,
     );
   }
 
