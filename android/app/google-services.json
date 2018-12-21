@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:714868893711:android:09a7671f1e7a8c80",
         "android_client_info": {
-          "package_name": "com.hquplink.hquplink"
+          "package_name": "com.hquplink.app"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "714868893711-kicnvgqdqrp09kskeb9mgmglrtip17n8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.hquplink.hquplink",
+            "package_name": "com.hquplink.app",
             "certificate_hash": "8aa7cccc456980ae50767d00c1b772e902a6aa79"
           }
         },

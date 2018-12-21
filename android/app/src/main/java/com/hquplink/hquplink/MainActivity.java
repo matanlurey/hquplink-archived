@@ -1,4 +1,4 @@
-package com.hquplink.hquplink;
+package com.hquplink.app;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
