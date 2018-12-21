@@ -26,7 +26,7 @@ class _CatalogModel extends InheritedWidget {
   }) : super(child: child);
 
   @override
-  bool operator==(Object o) => o is _CatalogModel && catalog == o.catalog;
+  bool operator ==(Object o) => o is _CatalogModel && catalog == o.catalog;
 
   @override
   int get hashCode => catalog.hashCode;

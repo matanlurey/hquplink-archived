@@ -58,5 +58,6 @@ class JsonStorage {
   }
 
   /// Deletes a file at [path].
-  Future<void> deleteJson(String path) async => (await _appDirFile(path)).delete(); 
+  Future<void> deleteJson(String path) async =>
+      (await _appDirFile(path)).delete();
 }
