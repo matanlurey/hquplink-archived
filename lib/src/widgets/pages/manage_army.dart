@@ -1,5 +1,6 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
+import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
 import 'package:swlegion/database.dart' as catalog;
 import 'package:swlegion/swlegion.dart';
@@ -163,8 +164,10 @@ class _ManageArmyPageState extends State<ManageArmyPage> {
       },
     );
     if (unit != null) {
+      final catalog = getCatalog(context);
+      final newUnit = catalog.createArmyUnit()..unit = unit.toBuilder();
       setState(() {
-        _editArmy.units.add(ArmyUnit((b) => b.unit = unit.toBuilder()));
+        _editArmy.units.add(newUnit.build());
       });
     }
   }
@@ -310,7 +313,7 @@ class _ListAllRanks extends StatelessWidget {
               onUpdated: (newUnit) {
                 var index = 0;
                 for (var i = 0; i < this.units.length; i++) {
-                  if (identical(unit, this.units[i])) {
+                  if (unit.id == this.units[i].id) {
                     index = i;
                     break;
                   }
@@ -403,6 +406,7 @@ class _ViewUnitCard extends StatelessWidget {
       }
     }
     Widget content = ExpansionTile(
+      key: Key(unit.id),
       title: Row(
         children: [
           Column(
@@ -539,7 +543,7 @@ class _ViewUnitCard extends StatelessWidget {
     );
     if (editMode) {
       content = Dismissible(
-        key: ObjectKey(unit),
+        key: Key(unit.id),
         onDismissed: (_) {
           onUpdated(null);
         },

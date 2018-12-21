@@ -7,11 +7,11 @@ class AddArmyDialog extends StatefulWidget {
   final ArmyBuilder initialData;
 
   const AddArmyDialog({
-    this.initialData,
+    @required this.initialData,
   });
 
   @override
-  createState() => _AddArmyState(initialData ?? ArmyBuilder());
+  createState() => _AddArmyState(initialData);
 }
 
 class _AddArmyState extends State<AddArmyDialog> {

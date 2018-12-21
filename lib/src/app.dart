@@ -83,10 +83,11 @@ class _HQUplinkAppState extends State<HQUplinkApp> {
   }
 
   void _onAddArmyPressed(BuildContext context) async {
+    final catalog = getCatalog(context);
     final result = await Navigator.push(
       context,
       MaterialPageRoute<Army>(
-        builder: (_) => const AddArmyDialog(),
+        builder: (_) => AddArmyDialog(initialData: catalog.createArmy()),
         fullscreenDialog: true,
       ),
     );
@@ -103,7 +104,7 @@ class _HQUplinkAppState extends State<HQUplinkApp> {
   }
 
   void _saveRoster() async {
-    await const JsonStorage().save(
+    await const JsonStorage().saveJson(
       roster,
       Roster.serializer,
       'roster.json',

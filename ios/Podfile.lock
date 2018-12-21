@@ -1,4 +1,6 @@
 PODS:
+  - device_id (0.0.1):
+    - Flutter
   - Firebase/Auth (5.15.0):
     - Firebase/CoreOnly
     - FirebaseAuth (= 5.2.0)
@@ -87,6 +89,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - device_id (from `.symlinks/plugins/device_id/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `.symlinks/flutter/ios`)
@@ -110,6 +113,8 @@ SPEC REPOS:
     - nanopb
 
 EXTERNAL SOURCES:
+  device_id:
+    :path: ".symlinks/plugins/device_id/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
@@ -124,6 +129,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences/ios"
 
 SPEC CHECKSUMS:
+  device_id: 5836cf6a30cd5bb9e474258644cff92477556b8b
   Firebase: 8bb9268bff82374f2cbaaabb143e725743c316ae
   firebase_auth: 27a5a77a032d557c18f8e223aaf8ec1368f6cdbc
   firebase_core: c96aa8b2fcf7f5167d32f22034f502f9304952b8
@@ -143,6 +149,6 @@ SPEC CHECKSUMS:
   path_provider: 09407919825bfe3c2deae39453b7a5b44f467873
   shared_preferences: 5a1d487c427ee18fcd3ea1f2a131569481834b53
 
-PODFILE CHECKSUM: aff02bfeed411c636180d6812254b2daeea14d09
+PODFILE CHECKSUM: 8d933cb6850a7cb5d84e1bfa5994143ae9edb762
 
 COCOAPODS: 1.5.3
