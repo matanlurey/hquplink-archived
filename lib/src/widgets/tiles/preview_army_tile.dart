@@ -37,24 +37,22 @@ class PreviewArmyTile extends StatelessWidget {
           army.faction,
           height: 24,
         ),
-        trailing: IconButton(
-          icon: const Icon(Icons.chevron_right),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (context) {
-                  return ManageArmyPage(
-                    army: army,
-                    onDelete: () => _onDismiss(context),
-                    onSave: onUpdate,
-                  );
-                },
-                fullscreenDialog: true,
-              ),
-            );
-          },
-        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (context) {
+                return ManageArmyPage(
+                  army: army,
+                  onDelete: () => _onDismiss(context),
+                  onSave: onUpdate,
+                );
+              },
+              fullscreenDialog: true,
+            ),
+          );
+        },
       ),
       background: const _DismissBackground(),
       onDismissed: (_) => _onDismiss(context),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hquplink/widgets.dart';
 import 'package:swlegion/swlegion.dart';
 
 /// A full-screen dialog to add a new [Army].
@@ -108,6 +109,25 @@ class _AddArmyState extends State<AddArmyDialog> {
                     child: Text('Imperials'),
                     value: Faction.darkSide,
                   ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              alignment: Alignment.bottomLeft,
+              child: Column(
+                children: [
+                  MaxPointsSlider(
+                    maxPoints: army.maxPoints ?? 0,
+                    onChanged: (newMaxPoints) {
+                      if (newMaxPoints == 0) {
+                        newMaxPoints = null;
+                      }
+                      setState(() {
+                        army.maxPoints = newMaxPoints;
+                      });
+                    },
+                  )
                 ],
               ),
             ),
