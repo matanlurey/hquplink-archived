@@ -39,7 +39,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.hquplink.hquplink"
+        applicationId "com.hquplink.app"
         minSdkVersion 16
         targetSdkVersion 27
         versionCode flutterVersionCode.toInteger()
