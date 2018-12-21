@@ -31,7 +31,7 @@ class JsonStorage {
   }
 
   /// Loads a file at [path] and deserialized it to [T] using [serializer].
-  Future<T> load<T>(
+  Future<T> loadJson<T>(
     Serializer<T> serializer,
     String path, {
     T Function() defaultTo,
@@ -46,7 +46,7 @@ class JsonStorage {
   }
 
   /// Saves a file at [path] serializing [entity] using [serializer].
-  Future<void> save<T>(
+  Future<void> saveJson<T>(
     T entity,
     Serializer<T> serializer,
     String path,
@@ -56,4 +56,7 @@ class JsonStorage {
     final json = jsonEncode(data);
     return file.writeAsString(json);
   }
+
+  /// Deletes a file at [path].
+  Future<void> deleteJson(String path) async => (await _appDirFile(path)).delete(); 
 }

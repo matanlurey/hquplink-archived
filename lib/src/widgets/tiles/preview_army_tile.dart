@@ -18,18 +18,18 @@ class PreviewArmyTile extends StatelessWidget {
   /// Invoked when the user modifies the instance and updates it.
   final void Function(Army) onUpdate;
 
-  const PreviewArmyTile({
+  PreviewArmyTile({
     @required this.army,
     @required this.onDismiss,
     @required this.onDeleted,
     @required this.onRestore,
     @required this.onUpdate,
-  });
+  }) : super(key: Key(army.id));
 
   @override
   build(context) {
     return Dismissible(
-      key: Key(army.name),
+      key: Key(army.id),
       child: ListTile(
         title: Text(army.name),
         subtitle: Text('${army.points} points'),
