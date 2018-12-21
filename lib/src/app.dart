@@ -1,116 +1,112 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:swlegion/database.dart' as database;
+import 'package:hquplink/models.dart';
+import 'package:hquplink/services.dart';
+import 'package:hquplink/widgets.dart';
+import 'package:swlegion/swlegion.dart';
 
-import 'routes.dart';
-import 'services/auth.dart' as services;
-import 'services/catalog.dart' as services;
-import 'services/table.dart' as services;
+class HQUplinkApp extends StatefulWidget {
+  final bool enableDeveloperMode;
+  final Roster initialRoster;
 
-class App extends StatelessWidget {
-  static final _builtInCatalog = services.Catalog(
-    units: List.unmodifiable(
-      database.units.toList()..sort((a, b) => a.name.compareTo(b.name)),
-    ),
-    upgrades: List.unmodifiable(
-      database.upgrades.toList()..sort((a, b) => a.name.compareTo(b.name)),
-    ),
-    weapons: List.unmodifiable(
-      database.weapons.toList()..sort((a, b) => a.name.compareTo(b.name)),
-    ),
-    version: 'BUILT_IN',
-  );
+  const HQUplinkApp({
+    this.enableDeveloperMode = const bool.fromEnvironment('dart.vm.product'),
+    @required this.initialRoster,
+  })  : assert(enableDeveloperMode != null),
+        assert(initialRoster != null);
 
-  static const _initialTable = services.Table(
-    elements: const [],
-    version: 1,
-  );
+  @override
+  createState() => _HQUplinkAppState(roster: initialRoster);
+}
 
-  static Widget _provideAuth(Widget child) {
-    return StreamBuilder<services.Auth>(
-      builder: (context, snapshot) {
-        return services.AuthModel(
-          auth: snapshot.data,
-          child: child,
-        );
-      },
-      initialData: const services.Auth(),
-      stream: services.Auth.onUpdate,
-    );
-  }
+class _HQUplinkAppState extends State<HQUplinkApp> {
+  Roster roster;
 
-  static Widget _provideCatalog(Widget child) {
-    return services.CatalogModel(
-      catalog: _builtInCatalog,
-      child: child,
-    );
-  }
-
-  static final _loadFromDisk = services.Table.fromDisk();
-  static Widget _provideTable(Widget child) {
-    final controller = StreamController<services.Table>();
-    return FutureBuilder<services.Table>(
-      builder: (context, snapshot) {
-        return StreamBuilder<services.Table>(
-          builder: (context, snapshot) {
-            return services.TableModel(
-              table: snapshot.data,
-              child: child,
-              onUpdate: controller.add,
-            );
-          },
-          initialData: _initialTable,
-          stream: controller.stream,
-        );
-      },
-      initialData: const services.Table(
-        elements: [],
-        version: 1,
-      ),
-      future: _loadFromDisk,
-    );
-  }
-
-  const App();
+  _HQUplinkAppState({
+    @required this.roster,
+  });
 
   @override
   build(_) {
-    return _provideAuth(
-      _provideTable(
-        _provideCatalog(
-          MaterialApp(
-            title: 'HQ Uplink',
-            theme: ThemeData(
-              primarySwatch: Colors.blueGrey,
-            ),
-            routes: {
-              tablePage.name: tablePage.build,
-              browseKeywordsPage.name: browseKeywordsPage.build,
-              browseUpgradesPage.name: browseUpgradesPage.build,
-              browseUnitsPage.name: browseUnitsPage.build,
-              browseWeaponsPage.name: browseWeaponsPage.build,
-            },
-            onGenerateRoute: (route) {
-              final useRoute = [
-                detailsUnitsPage,
-                detailsUpgradesPage,
-              ].firstWhere(
-                (r) => route.name.startsWith(r.name),
-                orElse: () => null,
-              );
-              if (useRoute != null) {
-                return MaterialPageRoute<void>(
-                  builder: (context) {
-                    return useRoute.build(context, route);
-                  },
-                );
-              }
-            },
-            debugShowCheckedModeBanner: false,
-          ),
-        ),
+    return MaterialApp(
+      title: 'HQ Uplink',
+      theme: ThemeData.dark().copyWith(
+        primaryColor: Colors.blueGrey.shade800,
+        accentColor: Colors.blueGrey.shade400,
       ),
+      home: Builder(
+        builder: (context) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('HQ Uplink'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => _onAddArmyPressed(context),
+                ),
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(8),
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  final army = roster.armies[index];
+                  return Card(
+                    child: PreviewArmyTile(
+                      army: army,
+                      onDismiss: () {
+                        _setRoster(
+                            roster.rebuild((b) => b.armies.removeAt(index)));
+                      },
+                      onDeleted: () async {
+                        _saveRoster();
+                      },
+                      onRestore: () {
+                        _setRoster(roster
+                            .rebuild((b) => b.armies.insert(index, army)));
+                      },
+                      onUpdate: (updated) {
+                        _setRoster(
+                            roster.rebuild((b) => b.armies[index] = updated));
+                        _saveRoster();
+                      },
+                    ),
+                  );
+                },
+                itemCount: roster.armies.length,
+              ),
+            ),
+          );
+        },
+      ),
+      debugShowCheckedModeBanner: widget.enableDeveloperMode,
+    );
+  }
+
+  void _onAddArmyPressed(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute<Army>(
+        builder: (_) => const AddArmyDialog(),
+        fullscreenDialog: true,
+      ),
+    );
+    if (result != null) {
+      _setRoster(roster.rebuild((b) => b.armies.insert(0, result)));
+      _saveRoster();
+    }
+  }
+
+  void _setRoster(Roster newRoster) {
+    setState(() {
+      roster = newRoster;
+    });
+  }
+
+  void _saveRoster() async {
+    await const JsonStorage().save(
+      roster,
+      Roster.serializer,
+      'roster.json',
     );
   }
 }
