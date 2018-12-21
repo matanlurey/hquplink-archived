@@ -313,7 +313,7 @@ class _ListAllRanks extends StatelessWidget {
               onUpdated: (newUnit) {
                 var index = 0;
                 for (var i = 0; i < this.units.length; i++) {
-                  if (identical(unit, this.units[i])) {
+                  if (unit.id == this.units[i].id) {
                     index = i;
                     break;
                   }
@@ -406,6 +406,7 @@ class _ViewUnitCard extends StatelessWidget {
       }
     }
     Widget content = ExpansionTile(
+      key: Key(unit.id),
       title: Row(
         children: [
           Column(
