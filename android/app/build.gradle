@@ -64,12 +64,14 @@ android {
         }
     }
 
+    flavorDimensions "version"
+
     productFlavors {
-        earlyAccess {
+        // flutter build apk --flavor early
+        early {
             signingConfig signingConfigs.release
-            minifyEnabled true
-            useProguard true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            dimension "version"
+            versionNameSuffix "-earlyAccess"
         }
     }
 }
