@@ -130,14 +130,6 @@ class _ManageArmyPageState extends State<ManageArmyPage> {
   }
 
   Widget _buildFormContents() {
-    final viewPoints = Column(
-      children: [
-        Text(
-          '${_viewArmy.points} Points | ${_viewArmy.units.length} Activations',
-        ),
-        const Divider(),
-      ],
-    );
     if (_editMode) {
       return Column(
         children: [
@@ -148,11 +140,18 @@ class _ManageArmyPageState extends State<ManageArmyPage> {
             ),
             maxLength: 64,
           ),
-          viewPoints,
+          MaxPointsSlider(
+            maxPoints: _editArmy.maxPoints,
+            onChanged: (p) {
+              setState(() {
+                _editArmy.maxPoints = p;
+              });
+            },
+          ),
         ],
       );
     } else {
-      return viewPoints;
+      return Wrap();
     }
   }
 
@@ -177,7 +176,9 @@ class _ManageArmyPageState extends State<ManageArmyPage> {
     final factionColor = _viewArmy.faction == Faction.lightSide
         ? _lightSideColor
         : _darkSideColor;
-    final displayUnits = _editMode ? _editArmy.units.build() : _viewArmy.units;
+    final displayArmy = _editMode ? _editArmy.build() : _viewArmy;
+    final displayUnits = displayArmy.units;
+    final theme = Theme.of(context);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -186,7 +187,10 @@ class _ManageArmyPageState extends State<ManageArmyPage> {
             expandedHeight: 128,
             backgroundColor: factionColor,
             flexibleSpace: FlexibleSpaceBar(
-              title: _buildTitle(),
+              title: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _buildTitle(),
+              ),
               background: _FactionDecoration(
                 faction: _viewArmy.faction,
                 color: factionColor,
@@ -194,6 +198,30 @@ class _ManageArmyPageState extends State<ManageArmyPage> {
             ),
             actions: _buildActions(),
             leading: _buildLeading(),
+            bottom: PreferredSize(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Row(
+                      children: [
+                        Text('${displayArmy.points}'),
+                        Text(
+                          ' / ${displayArmy.maxPoints ?? '∞'}',
+                          style: displayArmy.withinMaxPoints
+                              ? null
+                              : TextStyle(color: theme.errorColor),
+                        ),
+                        const Text(' Points'),
+                      ],
+                    ),
+                    Text('${displayUnits.length} Activations'),
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+              ),
+              preferredSize: const Size(0, 6),
+            ),
           ),
           SliverList(
             delegate: SliverChildListDelegate([

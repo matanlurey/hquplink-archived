@@ -55,18 +55,21 @@ class _HQUplinkAppState extends State<HQUplinkApp> {
                       army: army,
                       onDismiss: () {
                         _setRoster(
-                            roster.rebuild((b) => b.armies.removeAt(index)));
+                          roster.rebuild((b) => b.armies.removeAt(index)),
+                        );
                       },
                       onDeleted: () async {
                         _saveRoster();
                       },
                       onRestore: () {
-                        _setRoster(roster
-                            .rebuild((b) => b.armies.insert(index, army)));
+                        _setRoster(
+                          roster.rebuild((b) => b.armies.insert(index, army)),
+                        );
                       },
                       onUpdate: (updated) {
                         _setRoster(
-                            roster.rebuild((b) => b.armies[index] = updated));
+                          roster.rebuild((b) => b.armies[index] = updated),
+                        );
                         _saveRoster();
                       },
                     ),

@@ -24,7 +24,9 @@ class Catalog {
         upgrades = List.unmodifiable(upgrades);
 
   /// Creates a new empty [ArmyBuilder] with [ArmyBuilder.id] preset.
-  ArmyBuilder createArmy() => ArmyBuilder()..id = generateLocalId();
+  ArmyBuilder createArmy() => ArmyBuilder()
+    ..maxPoints = 800
+    ..id = generateLocalId();
 
   /// Creates a new empty [ArmyUnitBuilder] with [ArmyUnitBuilder.id] preset.
   ArmyUnitBuilder createArmyUnit() => ArmyUnitBuilder()..id = generateLocalId();

@@ -8,6 +8,7 @@ export 'src/widgets/icons/faction_icon.dart';
 export 'src/widgets/icons/rank_icon.dart';
 export 'src/widgets/icons/unit_icon.dart';
 export 'src/widgets/icons/upgrade_icon.dart';
+export 'src/widgets/misc/max_points_slider.dart';
 export 'src/widgets/pages/manage_army.dart';
 export 'src/widgets/tiles/preview_army_tile.dart';
 
