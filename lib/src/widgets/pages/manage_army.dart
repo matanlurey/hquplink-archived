@@ -2,7 +2,6 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
-import 'package:swlegion/database.dart' as catalog;
 import 'package:swlegion/swlegion.dart';
 
 class ManageArmyPage extends StatefulWidget {
@@ -164,7 +163,7 @@ class _ManageArmyPageState extends State<ManageArmyPage> {
     );
     if (unit != null) {
       final catalog = getCatalog(context);
-      final newUnit = catalog.createArmyUnit()..unit = unit.toBuilder();
+      final newUnit = catalog.createArmyUnit()..unit = unit.toKey().toBuilder();
       setState(() {
         _editArmy.units.add(newUnit.build());
       });
@@ -179,6 +178,10 @@ class _ManageArmyPageState extends State<ManageArmyPage> {
     final displayArmy = _editMode ? _editArmy.build() : _viewArmy;
     final displayUnits = displayArmy.units;
     final theme = Theme.of(context);
+    final catalog = getCatalog(context);
+    final sumPoints = catalog.sumArmyPoints(displayArmy);
+    final withinMaxPoints =
+        displayArmy.maxPoints == null || sumPoints <= displayArmy.maxPoints;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -205,10 +208,10 @@ class _ManageArmyPageState extends State<ManageArmyPage> {
                   children: [
                     Row(
                       children: [
-                        Text('${displayArmy.points}'),
+                        Text('${catalog.sumArmyPoints(displayArmy)}'),
                         Text(
                           ' / ${displayArmy.maxPoints ?? '∞'}',
-                          style: displayArmy.withinMaxPoints
+                          style: withinMaxPoints
                               ? null
                               : TextStyle(color: theme.errorColor),
                         ),
@@ -315,6 +318,7 @@ class _ListAllRanks extends StatelessWidget {
     if (!editMode && units.isEmpty) {
       return const Center(child: Text('Press edit to add units'));
     }
+    final catalog = getCatalog(context);
     return Column(
       children: const [
         Rank.commander,
@@ -324,7 +328,10 @@ class _ListAllRanks extends StatelessWidget {
         Rank.support,
         Rank.heavy,
       ].map((rank) {
-        final units = this.units.where((u) => u.unit.rank == rank).toList();
+        final units = this
+            .units
+            .where((u) => catalog.lookupUnit(u.unit).rank == rank)
+            .toList();
         final header = _ListUnitRank(
           rank: rank,
           editMode: editMode,
@@ -413,22 +420,24 @@ class _ViewUnitCard extends StatelessWidget {
   @override
   build(context) {
     final theme = Theme.of(context);
+    final catalog = getCatalog(context);
     final tileTitles = [
       Text(
         unit.unit.name,
         style: theme.textTheme.body1,
       )
     ];
-    if (unit.unit.subTitle != null) {
+    final unitDetails = catalog.lookupUnit(unit.unit);
+    if (unitDetails.subTitle != null) {
       tileTitles.add(Text(
-        unit.unit.subTitle,
+        unitDetails.subTitle,
         style: theme.textTheme.body2.copyWith(
           color: theme.unselectedWidgetColor,
         ),
       ));
     }
-    final allWeapons = unit.unit.weapons.toSet();
-    for (final upgrade in unit.upgrades) {
+    final allWeapons = unitDetails.weapons.toSet();
+    for (final upgrade in unit.upgrades.map(catalog.lookupUpgrade)) {
       if (upgrade.weapon != null) {
         allWeapons.add(upgrade.weapon);
       }
@@ -451,7 +460,7 @@ class _ViewUnitCard extends StatelessWidget {
             padding: const EdgeInsets.all(4),
             child: ConstrainedBox(
               child: Text(
-                '${unit.points}',
+                '${catalog.sumUnitPoints(unit)}',
                 style: theme.primaryTextTheme.caption.copyWith(
                   color: theme.accentTextTheme.headline.color,
                 ),
@@ -463,7 +472,7 @@ class _ViewUnitCard extends StatelessWidget {
         ],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
       ),
-      leading: UnitAvatar(unit.unit),
+      leading: UnitAvatar(unitDetails),
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -475,11 +484,11 @@ class _ViewUnitCard extends StatelessWidget {
                 children: [
                   Flexible(
                     flex: 6,
-                    child: _DisplayKeywords(keywords: unit.unit.keywords),
+                    child: _DisplayKeywords(keywords: unitDetails.keywords),
                   ),
                   Flexible(
                     flex: 4,
-                    child: _DisplayStatistics(unit: unit.unit),
+                    child: _DisplayStatistics(unit: unitDetails),
                   ),
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -491,7 +500,8 @@ class _ViewUnitCard extends StatelessWidget {
                     unit: unit,
                     editMode: editMode,
                     onAddUpgrade: (upgrade) {
-                      final unit = this.unit.toBuilder()..upgrades.add(upgrade);
+                      final unit = this.unit.toBuilder()
+                        ..upgrades.add(upgrade.toKey());
                       onUpdated(unit.build());
                     },
                     onRemoveUpgrade: (upgrade) {
@@ -735,7 +745,8 @@ class _DisplayUpgrades extends StatelessWidget {
   @override
   build(context) {
     final theme = Theme.of(context);
-    final slots = unit.unit.upgrades.keys;
+    final catalog = getCatalog(context);
+    final slots = catalog.lookupUnit(unit.unit).upgrades.keys;
     final children = <Widget>[];
     if (unit.upgrades.isNotEmpty) {
       children.addAll([
@@ -745,10 +756,12 @@ class _DisplayUpgrades extends StatelessWidget {
     }
     for (final slot in slots) {
       final title = toTitleCase(slot.name);
-      final upgrades = unit.upgrades.where((u) => u.type == slot).toList();
+      final unitDetails = catalog.lookupUnit(unit.unit);
+      final upgradeDetails = unit.upgrades.map(catalog.lookupUpgrade);
+      final upgrades = upgradeDetails.where((u) => u.type == slot).toList();
       if (editMode) {
         final trailing = <Widget>[
-          Text('${upgrades.length} / ${unit.unit.upgrades[slot]}'),
+          Text('${upgrades.length} / ${unitDetails.upgrades[slot]}'),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
@@ -757,7 +770,7 @@ class _DisplayUpgrades extends StatelessWidget {
                   builder: (_) {
                     return _AddUpgradeDialog(
                       slot: slot,
-                      unit: unit.unit,
+                      unit: unitDetails,
                     );
                   });
               if (upgrade != null) {
@@ -809,15 +822,16 @@ class _AddUnitDialog extends StatelessWidget {
     @required this.rank,
   }) : super(key: ValueKey(rank));
 
-  Iterable<Unit> _unitsOfRankAndFaction() {
+  Iterable<Unit> _unitsOfRankAndFaction(Catalog catalog) {
     return catalog.units.where((u) => u.faction == faction && u.rank == rank);
   }
 
   @override
   build(context) {
+    final catalog = getCatalog(context);
     return SimpleDialog(
       title: Text('Add ${toTitleCase(rank.name)}'),
-      children: _unitsOfRankAndFaction().map((unit) {
+      children: _unitsOfRankAndFaction(catalog).map((unit) {
         return ListTile(
           title: Text(unit.name, overflow: TextOverflow.ellipsis),
           subtitle: unit.subTitle != null
@@ -843,7 +857,7 @@ class _AddUpgradeDialog extends StatelessWidget {
     @required this.slot,
   }) : super(key: ValueKey(slot));
 
-  Iterable<Upgrade> _upgradesForUnitAndSlot() {
+  Iterable<Upgrade> _upgradesForUnitAndSlot(Catalog catalog) {
     return catalog.upgrades.where((u) {
       if (u.type != slot) {
         return false;
@@ -860,9 +874,10 @@ class _AddUpgradeDialog extends StatelessWidget {
 
   @override
   build(context) {
+    final catalog = getCatalog(context);
     return SimpleDialog(
       title: Text('Add ${toTitleCase(slot.name)} Upgrade'),
-      children: _upgradesForUnitAndSlot().map((upgrade) {
+      children: _upgradesForUnitAndSlot(catalog).map((upgrade) {
         return ListTile(
           title: Text(upgrade.name, overflow: TextOverflow.ellipsis),
           trailing: Text('${upgrade.points}'),

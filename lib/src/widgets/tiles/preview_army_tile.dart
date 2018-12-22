@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
 import 'package:swlegion/swlegion.dart';
 
@@ -28,11 +29,12 @@ class PreviewArmyTile extends StatelessWidget {
 
   @override
   build(context) {
+    final catalog = getCatalog(context);
     return Dismissible(
       key: Key(army.id),
       child: ListTile(
         title: Text(army.name),
-        subtitle: Text('${army.points} points'),
+        subtitle: Text('${catalog.sumArmyPoints(army)} points'),
         leading: FactionIcon(
           army.faction,
           height: 24,
@@ -45,7 +47,7 @@ class PreviewArmyTile extends StatelessWidget {
               builder: (context) {
                 return ManageArmyPage(
                   army: army,
-                  onDelete: () => _onDismiss(context),
+                  onDelete: () => _onDismiss(context, catalog),
                   onSave: onUpdate,
                 );
               },
@@ -55,13 +57,17 @@ class PreviewArmyTile extends StatelessWidget {
         },
       ),
       background: const _DismissBackground(),
-      onDismissed: (_) => _onDismiss(context),
+      onDismissed: (_) => _onDismiss(context, catalog),
     );
   }
 
-  void _onDismiss(BuildContext context, {bool confirm = false}) async {
+  void _onDismiss(
+    BuildContext context,
+    Catalog catalog, {
+    bool confirm = false,
+  }) async {
     onDismiss();
-    if (confirm && army.points > 0) {
+    if (confirm && catalog.sumArmyPoints(army) > 0) {
       if (await showConfirmDialog(
         context: context,
         title: 'Delete army?',
