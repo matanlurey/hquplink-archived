@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hquplink/models.dart';
 import 'package:hquplink/widgets.dart';
-import 'package:swlegion/swlegion.dart';
 
 /// A full-screen dialog to add a new [Army].
 class AddArmyDialog extends StatefulWidget {

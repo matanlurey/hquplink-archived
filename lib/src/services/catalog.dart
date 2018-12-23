@@ -1,6 +1,6 @@
+import 'package:hquplink/models.dart';
 import 'package:meta/meta.dart';
 import 'package:swlegion/database.dart' as aggregate;
-import 'package:swlegion/swlegion.dart';
 
 import 'unique_ids.dart';
 

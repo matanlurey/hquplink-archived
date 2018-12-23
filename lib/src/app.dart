@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
-import 'package:swlegion/swlegion.dart';
 
 class HQUplinkApp extends StatefulWidget {
   final bool enableDeveloperMode;

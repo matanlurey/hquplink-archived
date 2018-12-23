@@ -6,7 +6,70 @@ part of 'roster.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
+Serializers _$rosterSerializers = (new Serializers().toBuilder()
+      ..add(Army.serializer)
+      ..add(ArmyUnit.serializer)
+      ..add(AttackDice.serializer)
+      ..add(AttackSurge.serializer)
+      ..add(CommandCard.serializer)
+      ..add(CommandCardKey.serializer)
+      ..add(DefenseDice.serializer)
+      ..add(Faction.serializer)
+      ..add(Keyword.serializer)
+      ..add(Rank.serializer)
+      ..add(Roster.serializer)
+      ..add(Unit.serializer)
+      ..add(UnitKey.serializer)
+      ..add(UnitType.serializer)
+      ..add(Upgrade.serializer)
+      ..add(UpgradeKey.serializer)
+      ..add(UpgradeSlot.serializer)
+      ..add(Weapon.serializer)
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(Army)]),
+          () => new ListBuilder<Army>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(ArmyUnit)]),
+          () => new ListBuilder<ArmyUnit>())
+      ..addBuilderFactory(
+          const FullType(BuiltSet, const [const FullType(CommandCardKey)]),
+          () => new SetBuilder<CommandCardKey>())
+      ..addBuilderFactory(
+          const FullType(BuiltMap,
+              const [const FullType(AttackDice), const FullType(int)]),
+          () => new MapBuilder<AttackDice, int>())
+      ..addBuilderFactory(
+          const FullType(BuiltMap,
+              const [const FullType(Keyword), const FullType(String)]),
+          () => new MapBuilder<Keyword, String>())
+      ..addBuilderFactory(
+          const FullType(BuiltMap,
+              const [const FullType(Keyword), const FullType(String)]),
+          () => new MapBuilder<Keyword, String>())
+      ..addBuilderFactory(
+          const FullType(BuiltSet, const [const FullType(Unit)]),
+          () => new SetBuilder<Unit>())
+      ..addBuilderFactory(
+          const FullType(BuiltMap,
+              const [const FullType(UpgradeSlot), const FullType(int)]),
+          () => new MapBuilder<UpgradeSlot, int>())
+      ..addBuilderFactory(
+          const FullType(BuiltSet, const [const FullType(Weapon)]),
+          () => new SetBuilder<Weapon>())
+      ..addBuilderFactory(
+          const FullType(BuiltMap,
+              const [const FullType(Keyword), const FullType(String)]),
+          () => new MapBuilder<Keyword, String>())
+      ..addBuilderFactory(
+          const FullType(BuiltSet, const [const FullType(Unit)]),
+          () => new SetBuilder<Unit>())
+      ..addBuilderFactory(
+          const FullType(BuiltSet, const [const FullType(UpgradeKey)]),
+          () => new SetBuilder<UpgradeKey>()))
+    .build();
 Serializer<Roster> _$rosterSerializer = new _$RosterSerializer();
+Serializer<Army> _$armySerializer = new _$ArmySerializer();
+Serializer<ArmyUnit> _$armyUnitSerializer = new _$ArmyUnitSerializer();
 
 class _$RosterSerializer implements StructuredSerializer<Roster> {
   @override
@@ -43,6 +106,139 @@ class _$RosterSerializer implements StructuredSerializer<Roster> {
                   specifiedType:
                       const FullType(BuiltList, const [const FullType(Army)]))
               as BuiltList);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$ArmySerializer implements StructuredSerializer<Army> {
+  @override
+  final Iterable<Type> types = const [Army, _$Army];
+  @override
+  final String wireName = 'Army';
+
+  @override
+  Iterable serialize(Serializers serializers, Army object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object>[
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'faction',
+      serializers.serialize(object.faction,
+          specifiedType: const FullType(Faction)),
+      'maxPoints',
+      serializers.serialize(object.maxPoints,
+          specifiedType: const FullType(int)),
+      'name',
+      serializers.serialize(object.name, specifiedType: const FullType(String)),
+      'units',
+      serializers.serialize(object.units,
+          specifiedType:
+              const FullType(BuiltList, const [const FullType(ArmyUnit)])),
+      'commands',
+      serializers.serialize(object.commands,
+          specifiedType:
+              const FullType(BuiltSet, const [const FullType(CommandCardKey)])),
+    ];
+
+    return result;
+  }
+
+  @override
+  Army deserialize(Serializers serializers, Iterable serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = new ArmyBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current as String;
+      iterator.moveNext();
+      final dynamic value = iterator.current;
+      switch (key) {
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'faction':
+          result.faction = serializers.deserialize(value,
+              specifiedType: const FullType(Faction)) as Faction;
+          break;
+        case 'maxPoints':
+          result.maxPoints = serializers.deserialize(value,
+              specifiedType: const FullType(int)) as int;
+          break;
+        case 'name':
+          result.name = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'units':
+          result.units.replace(serializers.deserialize(value,
+              specifiedType: const FullType(
+                  BuiltList, const [const FullType(ArmyUnit)])) as BuiltList);
+          break;
+        case 'commands':
+          result.commands.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltSet, const [const FullType(CommandCardKey)]))
+              as BuiltSet);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$ArmyUnitSerializer implements StructuredSerializer<ArmyUnit> {
+  @override
+  final Iterable<Type> types = const [ArmyUnit, _$ArmyUnit];
+  @override
+  final String wireName = 'ArmyUnit';
+
+  @override
+  Iterable serialize(Serializers serializers, ArmyUnit object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object>[
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'unit',
+      serializers.serialize(object.unit,
+          specifiedType: const FullType(UnitKey)),
+      'upgrades',
+      serializers.serialize(object.upgrades,
+          specifiedType:
+              const FullType(BuiltSet, const [const FullType(UpgradeKey)])),
+    ];
+
+    return result;
+  }
+
+  @override
+  ArmyUnit deserialize(Serializers serializers, Iterable serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = new ArmyUnitBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current as String;
+      iterator.moveNext();
+      final dynamic value = iterator.current;
+      switch (key) {
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String;
+          break;
+        case 'unit':
+          result.unit.replace(serializers.deserialize(value,
+              specifiedType: const FullType(UnitKey)) as UnitKey);
+          break;
+        case 'upgrades':
+          result.upgrades.replace(serializers.deserialize(value,
+              specifiedType: const FullType(
+                  BuiltSet, const [const FullType(UpgradeKey)])) as BuiltSet);
           break;
       }
     }
@@ -132,6 +328,303 @@ class RosterBuilder implements Builder<Roster, RosterBuilder> {
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             'Roster', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$Army extends Army {
+  @override
+  final String id;
+  @override
+  final Faction faction;
+  @override
+  final int maxPoints;
+  @override
+  final String name;
+  @override
+  final BuiltList<ArmyUnit> units;
+  @override
+  final BuiltSet<CommandCardKey> commands;
+
+  factory _$Army([void updates(ArmyBuilder b)]) =>
+      (new ArmyBuilder()..update(updates)).build();
+
+  _$Army._(
+      {this.id,
+      this.faction,
+      this.maxPoints,
+      this.name,
+      this.units,
+      this.commands})
+      : super._() {
+    if (id == null) {
+      throw new BuiltValueNullFieldError('Army', 'id');
+    }
+    if (faction == null) {
+      throw new BuiltValueNullFieldError('Army', 'faction');
+    }
+    if (maxPoints == null) {
+      throw new BuiltValueNullFieldError('Army', 'maxPoints');
+    }
+    if (name == null) {
+      throw new BuiltValueNullFieldError('Army', 'name');
+    }
+    if (units == null) {
+      throw new BuiltValueNullFieldError('Army', 'units');
+    }
+    if (commands == null) {
+      throw new BuiltValueNullFieldError('Army', 'commands');
+    }
+  }
+
+  @override
+  Army rebuild(void updates(ArmyBuilder b)) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  ArmyBuilder toBuilder() => new ArmyBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is Army &&
+        id == other.id &&
+        faction == other.faction &&
+        maxPoints == other.maxPoints &&
+        name == other.name &&
+        units == other.units &&
+        commands == other.commands;
+  }
+
+  @override
+  int get hashCode {
+    return $jf($jc(
+        $jc(
+            $jc(
+                $jc($jc($jc(0, id.hashCode), faction.hashCode),
+                    maxPoints.hashCode),
+                name.hashCode),
+            units.hashCode),
+        commands.hashCode));
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper('Army')
+          ..add('id', id)
+          ..add('faction', faction)
+          ..add('maxPoints', maxPoints)
+          ..add('name', name)
+          ..add('units', units)
+          ..add('commands', commands))
+        .toString();
+  }
+}
+
+class ArmyBuilder implements Builder<Army, ArmyBuilder> {
+  _$Army _$v;
+
+  String _id;
+  String get id => _$this._id;
+  set id(String id) => _$this._id = id;
+
+  Faction _faction;
+  Faction get faction => _$this._faction;
+  set faction(Faction faction) => _$this._faction = faction;
+
+  int _maxPoints;
+  int get maxPoints => _$this._maxPoints;
+  set maxPoints(int maxPoints) => _$this._maxPoints = maxPoints;
+
+  String _name;
+  String get name => _$this._name;
+  set name(String name) => _$this._name = name;
+
+  ListBuilder<ArmyUnit> _units;
+  ListBuilder<ArmyUnit> get units =>
+      _$this._units ??= new ListBuilder<ArmyUnit>();
+  set units(ListBuilder<ArmyUnit> units) => _$this._units = units;
+
+  SetBuilder<CommandCardKey> _commands;
+  SetBuilder<CommandCardKey> get commands =>
+      _$this._commands ??= new SetBuilder<CommandCardKey>();
+  set commands(SetBuilder<CommandCardKey> commands) =>
+      _$this._commands = commands;
+
+  ArmyBuilder();
+
+  ArmyBuilder get _$this {
+    if (_$v != null) {
+      _id = _$v.id;
+      _faction = _$v.faction;
+      _maxPoints = _$v.maxPoints;
+      _name = _$v.name;
+      _units = _$v.units?.toBuilder();
+      _commands = _$v.commands?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(Army other) {
+    if (other == null) {
+      throw new ArgumentError.notNull('other');
+    }
+    _$v = other as _$Army;
+  }
+
+  @override
+  void update(void updates(ArmyBuilder b)) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  _$Army build() {
+    _$Army _$result;
+    try {
+      _$result = _$v ??
+          new _$Army._(
+              id: id,
+              faction: faction,
+              maxPoints: maxPoints,
+              name: name,
+              units: units.build(),
+              commands: commands.build());
+    } catch (_) {
+      String _$failedField;
+      try {
+        _$failedField = 'units';
+        units.build();
+        _$failedField = 'commands';
+        commands.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            'Army', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$ArmyUnit extends ArmyUnit {
+  @override
+  final String id;
+  @override
+  final UnitKey unit;
+  @override
+  final BuiltSet<UpgradeKey> upgrades;
+
+  factory _$ArmyUnit([void updates(ArmyUnitBuilder b)]) =>
+      (new ArmyUnitBuilder()..update(updates)).build();
+
+  _$ArmyUnit._({this.id, this.unit, this.upgrades}) : super._() {
+    if (id == null) {
+      throw new BuiltValueNullFieldError('ArmyUnit', 'id');
+    }
+    if (unit == null) {
+      throw new BuiltValueNullFieldError('ArmyUnit', 'unit');
+    }
+    if (upgrades == null) {
+      throw new BuiltValueNullFieldError('ArmyUnit', 'upgrades');
+    }
+  }
+
+  @override
+  ArmyUnit rebuild(void updates(ArmyUnitBuilder b)) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  ArmyUnitBuilder toBuilder() => new ArmyUnitBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is ArmyUnit &&
+        id == other.id &&
+        unit == other.unit &&
+        upgrades == other.upgrades;
+  }
+
+  @override
+  int get hashCode {
+    return $jf($jc($jc($jc(0, id.hashCode), unit.hashCode), upgrades.hashCode));
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper('ArmyUnit')
+          ..add('id', id)
+          ..add('unit', unit)
+          ..add('upgrades', upgrades))
+        .toString();
+  }
+}
+
+class ArmyUnitBuilder implements Builder<ArmyUnit, ArmyUnitBuilder> {
+  _$ArmyUnit _$v;
+
+  String _id;
+  String get id => _$this._id;
+  set id(String id) => _$this._id = id;
+
+  UnitKeyBuilder _unit;
+  UnitKeyBuilder get unit => _$this._unit ??= new UnitKeyBuilder();
+  set unit(UnitKeyBuilder unit) => _$this._unit = unit;
+
+  SetBuilder<UpgradeKey> _upgrades;
+  SetBuilder<UpgradeKey> get upgrades =>
+      _$this._upgrades ??= new SetBuilder<UpgradeKey>();
+  set upgrades(SetBuilder<UpgradeKey> upgrades) => _$this._upgrades = upgrades;
+
+  ArmyUnitBuilder();
+
+  ArmyUnitBuilder get _$this {
+    if (_$v != null) {
+      _id = _$v.id;
+      _unit = _$v.unit?.toBuilder();
+      _upgrades = _$v.upgrades?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(ArmyUnit other) {
+    if (other == null) {
+      throw new ArgumentError.notNull('other');
+    }
+    _$v = other as _$ArmyUnit;
+  }
+
+  @override
+  void update(void updates(ArmyUnitBuilder b)) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  _$ArmyUnit build() {
+    _$ArmyUnit _$result;
+    try {
+      _$result = _$v ??
+          new _$ArmyUnit._(
+              id: id, unit: unit.build(), upgrades: upgrades.build());
+    } catch (_) {
+      String _$failedField;
+      try {
+        _$failedField = 'unit';
+        unit.build();
+        _$failedField = 'upgrades';
+        upgrades.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            'ArmyUnit', _$failedField, e.toString());
       }
       rethrow;
     }

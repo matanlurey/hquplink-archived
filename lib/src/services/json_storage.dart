@@ -8,13 +8,12 @@ import 'package:built_value/serializer.dart';
 import 'package:hquplink/models.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:swlegion/swlegion.dart';
 
 /// Supports loading and saving JSON documents to disk.
 class JsonStorage {
   static final _appDir = getApplicationDocumentsDirectory().then((d) => d.path);
   static final Serializers _jsonSerializer = () {
-    final builder = serializers.toBuilder()
+    final builder = rosterSerializers.toBuilder()
       ..add(Roster.serializer)
       ..addBuilderFactory(
         const FullType(BuiltList, [const FullType(Army)]),
