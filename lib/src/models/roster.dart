@@ -4,36 +4,28 @@ import 'package:built_value/serializer.dart';
 import 'package:meta/meta.dart';
 import 'package:swlegion/swlegion.dart';
 
-// TODO: Expose the builders for these classes to avoid these imports.
-// ignore_for_file: implementation_imports
-
-import 'package:swlegion/src/model/command_card.dart';
-import 'package:swlegion/src/model/unit.dart';
-import 'package:swlegion/src/model/upgrade.dart';
-
 part 'roster.g.dart';
 
-@SerializersFor([
-  Army,
-  ArmyUnit,
-  AttackDice,
-  AttackSurge,
-  CommandCard,
-  CommandCardKey,
-  DefenseDice,
-  Faction,
-  Keyword,
-  Rank,
-  Roster,
-  UnitType,
-  Unit,
-  UnitKey,
-  Upgrade,
-  UpgradeKey,
-  UpgradeSlot,
-  Weapon,
-])
-final Serializers rosterSerializers = _$rosterSerializers;
+final Serializers rosterSerializers = () {
+  final builder = serializers.toBuilder();
+
+  // Add new serializers.
+  // ignore: cascade_invocations
+  builder
+    ..add(Roster.serializer)
+    ..addBuilderFactory(
+      const FullType(BuiltList, [FullType(Army)]),
+      () => ListBuilder<Army>(),
+    )
+    ..add(Army.serializer)
+    ..addBuilderFactory(
+      const FullType(BuiltList, [FullType(ArmyUnit)]),
+      () => ListBuilder<ArmyUnit>(),
+    )
+    ..add(ArmyUnit.serializer);
+
+  return builder.build();
+}();
 
 /// Represents a collection of [Army] lists, usually for a device or user.
 @Immutable()
@@ -71,7 +63,7 @@ abstract class Army implements Built<Army, ArmyBuilder> {
   BuiltList<ArmyUnit> get units;
 
   /// Commands.
-  BuiltSet<CommandCardKey> get commands;
+  BuiltSet<Reference<CommandCard>> get commands;
 }
 
 /// Represents a [Unit] and [Upgrade]s.
@@ -86,8 +78,8 @@ abstract class ArmyUnit implements Built<ArmyUnit, ArmyUnitBuilder> {
   String get id;
 
   /// Unit.
-  UnitKey get unit;
+  Reference<Unit> get unit;
 
   /// Upgrades.
-  BuiltSet<UpgradeKey> get upgrades;
+  BuiltSet<Reference<Upgrade>> get upgrades;
 }

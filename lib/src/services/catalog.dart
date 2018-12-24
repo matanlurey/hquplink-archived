@@ -4,48 +4,51 @@ import 'package:swlegion/database.dart' as aggregate;
 
 import 'unique_ids.dart';
 
-class Catalog {
-  static bool _nullOrEqual<T>(T a, T b) {
-    return a == null || a == b;
+/// Returns [elements] indexed as a `Map: Reference<E> -> E`.
+Map<Reference<E>, E> indexEntities<E extends Indexable<E>>(
+  Iterable<E> elements,
+) {
+  final results = <Reference<E>, E>{};
+  for (final e in elements) {
+    results[e.toRef()] = e;
   }
+  return Map.unmodifiable(results);
+}
 
+/// Data model for Star Wars: Legion.
+///
+/// Binds to the model and data from `package:swlegion`, and provides additional
+/// functionality for the application such as validation, filtering, and more.
+class Catalog {
   /// Catalog that is built-in to this package (not downloaded).
   static final builtIn = Catalog(
+    commands: aggregate.commands,
     units: aggregate.units,
     upgrades: aggregate.upgrades,
   );
 
-  final Map<UnitKey, Unit> _unitsIndexed;
-
-  static Map<UnitKey, Unit> _indexUnits(Iterable<Unit> units) {
-    final results = <UnitKey, Unit>{};
-    for (final unit in units) {
-      results[unit.toKey()] = unit;
-    }
-    return Map.unmodifiable(results);
+  /// Returns whether [a] is null _or_ whether `a == b`.
+  static bool _nullOrEqual<T>(T a, T b) {
+    return a == null || a == b;
   }
 
-  final Map<UpgradeKey, Upgrade> _upgradesIndexed;
-
-  static Map<UpgradeKey, Upgrade> _indexUpgrades(Iterable<Upgrade> upgrades) {
-    final results = <UpgradeKey, Upgrade>{};
-    for (final upgrade in upgrades) {
-      results[upgrade.toKey()] = upgrade;
-    }
-    return Map.unmodifiable(results);
-  }
+  final Map<Reference<CommandCard>, CommandCard> _commands;
+  final Map<Reference<Unit>, Unit> _units;
+  final Map<Reference<Upgrade>, Upgrade> _upgrades;
 
   Catalog({
+    @required Iterable<CommandCard> commands,
     @required Iterable<Unit> units,
     @required Iterable<Upgrade> upgrades,
-  })  : _unitsIndexed = _indexUnits(units),
-        _upgradesIndexed = _indexUpgrades(upgrades);
+  })  : _commands = indexEntities(commands),
+        _units = indexEntities(units),
+        _upgrades = indexEntities(upgrades);
 
   /// Units in the database.
-  Iterable<Unit> get units => _unitsIndexed.values;
+  Iterable<Unit> get units => _units.values;
 
   /// Upgrades in the database.
-  Iterable<Upgrade> get upgrades => _upgradesIndexed.values;
+  Iterable<Upgrade> get upgrades => _upgrades.values;
 
   /// Returns a new empty [ArmyBuilder].
   ///
@@ -66,11 +69,14 @@ class Catalog {
     return ArmyUnitBuilder()..id = generateLocalId();
   }
 
+  /// Returns the [CommandCard] for the cooresponding [key].
+  CommandCard lookupCommand(Reference<CommandCard> key) => _commands[key];
+
   /// Returns the [Unit] for the cooresponding [key].
-  Unit lookupUnit(UnitKey key) => _unitsIndexed[key];
+  Unit lookupUnit(Reference<Unit> key) => _units[key];
 
   /// Returns the [Upgrade] for the cooresponding [key].
-  Upgrade lookupUpgrade(UpgradeKey key) => _upgradesIndexed[key];
+  Upgrade lookupUpgrade(Reference<Upgrade> key) => _upgrades[key];
 
   /// Returns the sum of all points in the provided [army].
   int sumArmyPoints(Army army) {

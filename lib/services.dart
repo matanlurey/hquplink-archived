@@ -7,8 +7,20 @@ export 'src/services/json_storage.dart';
 export 'src/services/unique_ids.dart';
 
 /// Provides [catalog] accessible via [getCatalog] to [child]'s [Widget] tree.
-Widget provideCatalog(Catalog catalog, Widget child) {
-  return _CatalogModel(catalog: catalog, child: child);
+///
+/// May optionally provide [updates].
+Widget provideCatalog(Catalog catalog, Widget child,
+    {Stream<Catalog> updates}) {
+  return StreamBuilder<Catalog>(
+    builder: (context, snapshot) {
+      return _CatalogModel(
+        catalog: snapshot.data,
+        child: child,
+      );
+    },
+    initialData: catalog,
+    stream: updates,
+  );
 }
 
 /// Returns the [Catalog] service provides at the widget tree of [context].

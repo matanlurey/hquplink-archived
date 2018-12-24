@@ -9,7 +9,6 @@ export 'src/widgets/icons/rank_icon.dart';
 export 'src/widgets/icons/unit_icon.dart';
 export 'src/widgets/icons/upgrade_icon.dart';
 export 'src/widgets/misc/max_points_slider.dart';
-export 'src/widgets/pages/manage_army.dart';
 export 'src/widgets/tiles/preview_army_tile.dart';
 
 bool _isCapitalized(int character) => character >= 65 && character < 97;
@@ -49,7 +48,6 @@ Iterable<E> mapIndexed<E, T>(
   E Function(int, T) fn,
 ) sync* {
   var i = 0;
-  print(iterable.length);
   for (final element in iterable) {
     yield fn(i, element);
     i++;

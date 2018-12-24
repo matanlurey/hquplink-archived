@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/services.dart';
 
-import 'src/app.dart';
+import 'src/shell.dart';
 
 void main() async {
   // Use JSON Local Storage.
@@ -36,8 +36,7 @@ void main() async {
   runApp(
     provideCatalog(
       Catalog.builtIn,
-      HQUplinkApp(
-        enableDeveloperMode: false,
+      AppShell(
         initialRoster: roster,
       ),
     ),

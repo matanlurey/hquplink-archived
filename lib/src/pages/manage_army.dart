@@ -163,7 +163,7 @@ class _ManageArmyPageState extends State<ManageArmyPage> {
     );
     if (unit != null) {
       final catalog = getCatalog(context);
-      final newUnit = catalog.createArmyUnit()..unit = unit.toKey().toBuilder();
+      final newUnit = catalog.createArmyUnit()..unit = unit.toRef();
       setState(() {
         _editArmy.units.add(newUnit.build());
       });
@@ -423,7 +423,7 @@ class _ViewUnitCard extends StatelessWidget {
     final catalog = getCatalog(context);
     final tileTitles = [
       Text(
-        unit.unit.name,
+        catalog.lookupUnit(unit.unit).name,
         style: theme.textTheme.body1,
       )
     ];
@@ -501,7 +501,7 @@ class _ViewUnitCard extends StatelessWidget {
                     editMode: editMode,
                     onAddUpgrade: (upgrade) {
                       final unit = this.unit.toBuilder()
-                        ..upgrades.add(upgrade.toKey());
+                        ..upgrades.add(upgrade.toRef());
                       onUpdated(unit.build());
                     },
                     onRemoveUpgrade: (upgrade) {

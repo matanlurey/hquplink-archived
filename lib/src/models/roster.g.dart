@@ -6,67 +6,6 @@ part of 'roster.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
-Serializers _$rosterSerializers = (new Serializers().toBuilder()
-      ..add(Army.serializer)
-      ..add(ArmyUnit.serializer)
-      ..add(AttackDice.serializer)
-      ..add(AttackSurge.serializer)
-      ..add(CommandCard.serializer)
-      ..add(CommandCardKey.serializer)
-      ..add(DefenseDice.serializer)
-      ..add(Faction.serializer)
-      ..add(Keyword.serializer)
-      ..add(Rank.serializer)
-      ..add(Roster.serializer)
-      ..add(Unit.serializer)
-      ..add(UnitKey.serializer)
-      ..add(UnitType.serializer)
-      ..add(Upgrade.serializer)
-      ..add(UpgradeKey.serializer)
-      ..add(UpgradeSlot.serializer)
-      ..add(Weapon.serializer)
-      ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(Army)]),
-          () => new ListBuilder<Army>())
-      ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(ArmyUnit)]),
-          () => new ListBuilder<ArmyUnit>())
-      ..addBuilderFactory(
-          const FullType(BuiltSet, const [const FullType(CommandCardKey)]),
-          () => new SetBuilder<CommandCardKey>())
-      ..addBuilderFactory(
-          const FullType(BuiltMap,
-              const [const FullType(AttackDice), const FullType(int)]),
-          () => new MapBuilder<AttackDice, int>())
-      ..addBuilderFactory(
-          const FullType(BuiltMap,
-              const [const FullType(Keyword), const FullType(String)]),
-          () => new MapBuilder<Keyword, String>())
-      ..addBuilderFactory(
-          const FullType(BuiltMap,
-              const [const FullType(Keyword), const FullType(String)]),
-          () => new MapBuilder<Keyword, String>())
-      ..addBuilderFactory(
-          const FullType(BuiltSet, const [const FullType(Unit)]),
-          () => new SetBuilder<Unit>())
-      ..addBuilderFactory(
-          const FullType(BuiltMap,
-              const [const FullType(UpgradeSlot), const FullType(int)]),
-          () => new MapBuilder<UpgradeSlot, int>())
-      ..addBuilderFactory(
-          const FullType(BuiltSet, const [const FullType(Weapon)]),
-          () => new SetBuilder<Weapon>())
-      ..addBuilderFactory(
-          const FullType(BuiltMap,
-              const [const FullType(Keyword), const FullType(String)]),
-          () => new MapBuilder<Keyword, String>())
-      ..addBuilderFactory(
-          const FullType(BuiltSet, const [const FullType(Unit)]),
-          () => new SetBuilder<Unit>())
-      ..addBuilderFactory(
-          const FullType(BuiltSet, const [const FullType(UpgradeKey)]),
-          () => new SetBuilder<UpgradeKey>()))
-    .build();
 Serializer<Roster> _$rosterSerializer = new _$RosterSerializer();
 Serializer<Army> _$armySerializer = new _$ArmySerializer();
 Serializer<ArmyUnit> _$armyUnitSerializer = new _$ArmyUnitSerializer();
@@ -140,8 +79,9 @@ class _$ArmySerializer implements StructuredSerializer<Army> {
               const FullType(BuiltList, const [const FullType(ArmyUnit)])),
       'commands',
       serializers.serialize(object.commands,
-          specifiedType:
-              const FullType(BuiltSet, const [const FullType(CommandCardKey)])),
+          specifiedType: const FullType(BuiltSet, const [
+            const FullType(Reference, const [const FullType(CommandCard)])
+          ])),
     ];
 
     return result;
@@ -181,9 +121,9 @@ class _$ArmySerializer implements StructuredSerializer<Army> {
           break;
         case 'commands':
           result.commands.replace(serializers.deserialize(value,
-                  specifiedType: const FullType(
-                      BuiltSet, const [const FullType(CommandCardKey)]))
-              as BuiltSet);
+              specifiedType: const FullType(BuiltSet, const [
+                const FullType(Reference, const [const FullType(CommandCard)])
+              ])) as BuiltSet);
           break;
       }
     }
@@ -206,11 +146,13 @@ class _$ArmyUnitSerializer implements StructuredSerializer<ArmyUnit> {
       serializers.serialize(object.id, specifiedType: const FullType(String)),
       'unit',
       serializers.serialize(object.unit,
-          specifiedType: const FullType(UnitKey)),
+          specifiedType:
+              const FullType(Reference, const [const FullType(Unit)])),
       'upgrades',
       serializers.serialize(object.upgrades,
-          specifiedType:
-              const FullType(BuiltSet, const [const FullType(UpgradeKey)])),
+          specifiedType: const FullType(BuiltSet, const [
+            const FullType(Reference, const [const FullType(Upgrade)])
+          ])),
     ];
 
     return result;
@@ -232,13 +174,16 @@ class _$ArmyUnitSerializer implements StructuredSerializer<ArmyUnit> {
               specifiedType: const FullType(String)) as String;
           break;
         case 'unit':
-          result.unit.replace(serializers.deserialize(value,
-              specifiedType: const FullType(UnitKey)) as UnitKey);
+          result.unit = serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(Reference, const [const FullType(Unit)]))
+              as Reference<Unit>;
           break;
         case 'upgrades':
           result.upgrades.replace(serializers.deserialize(value,
-              specifiedType: const FullType(
-                  BuiltSet, const [const FullType(UpgradeKey)])) as BuiltSet);
+              specifiedType: const FullType(BuiltSet, const [
+                const FullType(Reference, const [const FullType(Upgrade)])
+              ])) as BuiltSet);
           break;
       }
     }
@@ -348,7 +293,7 @@ class _$Army extends Army {
   @override
   final BuiltList<ArmyUnit> units;
   @override
-  final BuiltSet<CommandCardKey> commands;
+  final BuiltSet<Reference<CommandCard>> commands;
 
   factory _$Army([void updates(ArmyBuilder b)]) =>
       (new ArmyBuilder()..update(updates)).build();
@@ -449,10 +394,10 @@ class ArmyBuilder implements Builder<Army, ArmyBuilder> {
       _$this._units ??= new ListBuilder<ArmyUnit>();
   set units(ListBuilder<ArmyUnit> units) => _$this._units = units;
 
-  SetBuilder<CommandCardKey> _commands;
-  SetBuilder<CommandCardKey> get commands =>
-      _$this._commands ??= new SetBuilder<CommandCardKey>();
-  set commands(SetBuilder<CommandCardKey> commands) =>
+  SetBuilder<Reference<CommandCard>> _commands;
+  SetBuilder<Reference<CommandCard>> get commands =>
+      _$this._commands ??= new SetBuilder<Reference<CommandCard>>();
+  set commands(SetBuilder<Reference<CommandCard>> commands) =>
       _$this._commands = commands;
 
   ArmyBuilder();
@@ -517,9 +462,9 @@ class _$ArmyUnit extends ArmyUnit {
   @override
   final String id;
   @override
-  final UnitKey unit;
+  final Reference<Unit> unit;
   @override
-  final BuiltSet<UpgradeKey> upgrades;
+  final BuiltSet<Reference<Upgrade>> upgrades;
 
   factory _$ArmyUnit([void updates(ArmyUnitBuilder b)]) =>
       (new ArmyUnitBuilder()..update(updates)).build();
@@ -574,21 +519,22 @@ class ArmyUnitBuilder implements Builder<ArmyUnit, ArmyUnitBuilder> {
   String get id => _$this._id;
   set id(String id) => _$this._id = id;
 
-  UnitKeyBuilder _unit;
-  UnitKeyBuilder get unit => _$this._unit ??= new UnitKeyBuilder();
-  set unit(UnitKeyBuilder unit) => _$this._unit = unit;
+  Reference<Unit> _unit;
+  Reference<Unit> get unit => _$this._unit;
+  set unit(Reference<Unit> unit) => _$this._unit = unit;
 
-  SetBuilder<UpgradeKey> _upgrades;
-  SetBuilder<UpgradeKey> get upgrades =>
-      _$this._upgrades ??= new SetBuilder<UpgradeKey>();
-  set upgrades(SetBuilder<UpgradeKey> upgrades) => _$this._upgrades = upgrades;
+  SetBuilder<Reference<Upgrade>> _upgrades;
+  SetBuilder<Reference<Upgrade>> get upgrades =>
+      _$this._upgrades ??= new SetBuilder<Reference<Upgrade>>();
+  set upgrades(SetBuilder<Reference<Upgrade>> upgrades) =>
+      _$this._upgrades = upgrades;
 
   ArmyUnitBuilder();
 
   ArmyUnitBuilder get _$this {
     if (_$v != null) {
       _id = _$v.id;
-      _unit = _$v.unit?.toBuilder();
+      _unit = _$v.unit;
       _upgrades = _$v.upgrades?.toBuilder();
       _$v = null;
     }
@@ -613,13 +559,10 @@ class ArmyUnitBuilder implements Builder<ArmyUnit, ArmyUnitBuilder> {
     _$ArmyUnit _$result;
     try {
       _$result = _$v ??
-          new _$ArmyUnit._(
-              id: id, unit: unit.build(), upgrades: upgrades.build());
+          new _$ArmyUnit._(id: id, unit: unit, upgrades: upgrades.build());
     } catch (_) {
       String _$failedField;
       try {
-        _$failedField = 'unit';
-        unit.build();
         _$failedField = 'upgrades';
         upgrades.build();
       } catch (e) {
