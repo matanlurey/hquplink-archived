@@ -394,7 +394,7 @@ class _ListUnitRank extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          leading: RankIcon(rank: rank),
+          leading: RankIcon(rank: rank, width: 40),
           title: titleText,
           trailing: Row(
             children: trailing,

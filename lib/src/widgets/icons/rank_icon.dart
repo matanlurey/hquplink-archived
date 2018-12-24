@@ -4,31 +4,28 @@ import 'package:swlegion/swlegion.dart';
 
 @Immutable()
 class RankIcon extends StatelessWidget {
-  static const _avatars = {
-    Rank.commander: CircleAvatar(
-      child: Text('CM'),
-    ),
-    Rank.operative: CircleAvatar(
-      child: Text('OP'),
-    ),
-    Rank.corps: CircleAvatar(
-      child: Text('CO'),
-    ),
-    Rank.specialForces: CircleAvatar(
-      child: Text('SF'),
-    ),
-    Rank.support: CircleAvatar(
-      child: Text('SP'),
-    ),
-    Rank.heavy: CircleAvatar(
-      child: Text('HV'),
-    ),
-  };
-
   final Rank rank;
+  final double width;
+  final double height;
+  final Color color;
+  final BoxFit fit;
 
-  RankIcon({this.rank}) : super(key: ValueKey(rank));
+  RankIcon({
+    this.rank,
+    this.width,
+    this.height,
+    this.color,
+    this.fit,
+  }) : super(key: ValueKey(rank));
 
   @override
-  build(_) => _avatars[rank];
+  build(_) {
+    return Image.asset(
+      'assets/ranks/${rank.name}.png',
+      width: width,
+      height: height,
+      color: color,
+      fit: fit,
+    );
+  }
 }

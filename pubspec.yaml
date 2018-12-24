@@ -33,5 +33,6 @@ flutter:
     - assets/
     - assets/cards/
     - assets/factions/
+    - assets/ranks/
     - assets/upgrades/
   uses-material-design: true

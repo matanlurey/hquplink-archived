@@ -1,16 +1,20 @@
 import 'package:flutter/widgets.dart';
 
 import 'src/services/catalog.dart';
+import 'src/services/storage.dart';
 
 export 'src/services/catalog.dart';
-export 'src/services/json_storage.dart';
+export 'src/services/storage.dart';
 export 'src/services/unique_ids.dart';
 
 /// Provides [catalog] accessible via [getCatalog] to [child]'s [Widget] tree.
 ///
 /// May optionally provide [updates].
-Widget provideCatalog(Catalog catalog, Widget child,
-    {Stream<Catalog> updates}) {
+Widget provideCatalog(
+  Catalog catalog,
+  Widget child, {
+  Stream<Catalog> updates,
+}) {
   return StreamBuilder<Catalog>(
     builder: (context, snapshot) {
       return _CatalogModel(
@@ -44,5 +48,37 @@ class _CatalogModel extends InheritedWidget {
   int get hashCode => catalog.hashCode;
 
   @override
-  bool updateShouldNotify(_CatalogModel oldWidget) => this == oldWidget;
+  bool updateShouldNotify(oldWidget) => this == oldWidget;
+}
+
+/// Provides [storage] accessible via [getStorage] to [child]'s [Widget] tree.
+Widget provideStorage(JsonStorage storage, Widget child) {
+  return _StorageModel(
+    storage: storage,
+    child: child,
+  );
+}
+
+/// Returns the [Catalog] service provides at the widget tree of [context].
+Catalog getStorage(BuildContext context) {
+  final model = context.inheritFromWidgetOfExactType(_CatalogModel);
+  return (model as _CatalogModel).catalog;
+}
+
+class _StorageModel extends InheritedWidget {
+  final JsonStorage storage;
+
+  const _StorageModel({
+    @required this.storage,
+    @required Widget child,
+  }) : super(child: child);
+
+  @override
+  bool operator ==(Object o) => o is _StorageModel && storage == o.storage;
+
+  @override
+  int get hashCode => storage.hashCode;
+
+  @override
+  bool updateShouldNotify(oldWidget) => this == oldWidget;
 }

@@ -1,16 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:hquplink/fakes.dart';
+import 'package:hquplink/models.dart';
 import 'package:hquplink/services.dart';
 
-import '../shell.dart';
+import '../fakes/fake_roster.dart';
+import 'run.dart';
 
-void main() {
-  runApp(
-    provideCatalog(
-      Catalog.builtIn,
-      AppShell(
-        initialRoster: fakeRoster,
-      ),
-    ),
+void main() async {
+  final storage = JsonStorage.toMemory();
+  await storage.saveJson(
+    fakeRoster,
+    Roster.serializer,
+    'roster.json',
+  );
+
+  return run(
+    overrideStorage: storage,
   );
 }

@@ -1,10 +1,9 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
+import 'package:hquplink/pages.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
-
-import 'manage_army.dart';
 
 /// Renders a collection of [Army]s.
 class ArmyListPage extends StatelessWidget {
@@ -76,10 +75,12 @@ class ArmyListPage extends StatelessWidget {
             context,
             MaterialPageRoute<void>(
               builder: (context) {
-                return ManageArmyPage(
+                return ArmyViewPage(
                   army: army,
-                  onDelete: () => _dismissArmy(army),
-                  onSave: (newArmy) {
+                  onUpdate: (newArmy) {
+                    if (newArmy == null) {
+                      return _dismissArmy(army);
+                    }
                     final builder = armies.toBuilder();
                     builder[armies.indexOf(army)] = newArmy;
                     onUpdate(builder.build());

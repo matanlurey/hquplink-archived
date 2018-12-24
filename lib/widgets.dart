@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:swlegion/swlegion.dart';
 
-export 'src/widgets/dialogs/add_army_dialog.dart';
 export 'src/widgets/dialogs/confirm_dialog.dart';
+export 'src/widgets/dialogs/create_army_dialog.dart';
 export 'src/widgets/icons/attack_dice_icon.dart';
 export 'src/widgets/icons/defense_dice_icon.dart';
 export 'src/widgets/icons/faction_icon.dart';
@@ -9,26 +10,32 @@ export 'src/widgets/icons/rank_icon.dart';
 export 'src/widgets/icons/unit_icon.dart';
 export 'src/widgets/icons/upgrade_icon.dart';
 export 'src/widgets/misc/max_points_slider.dart';
-export 'src/widgets/tiles/preview_army_tile.dart';
 
-bool _isCapitalized(int character) => character >= 65 && character < 97;
+final _matcher = RegExp(r'[_.\- ]+(\w|$)');
 
-/// Converts a [camelCased] string to `'Title Case'`.
-String toTitleCase(String camelCased) {
-  final buffer = StringBuffer();
-  for (var i = 0; i < camelCased.length; i++) {
-    final character = camelCased.codeUnitAt(i);
-    if (_isCapitalized(character)) {
-      buffer..write(' ')..write(String.fromCharCode(character));
-    } else {
-      var letter = String.fromCharCode(character);
-      if (i == 0) {
-        letter = letter.toUpperCase();
-      }
-      buffer.write(letter);
-    }
+const _darkSideColor = Color(0xFF42556C);
+const _lightSideColor = Color(0xFF833C34);
+final _neutralColor = Colors.grey.shade300;
+
+/// Returns the [Color] for the provided [faction].
+Color factionColor([Faction faction]) {
+  switch (faction) {
+    case Faction.darkSide:
+      return _darkSideColor;
+    case Faction.lightSide:
+      return _lightSideColor;
+    default:
+      return _neutralColor;
   }
-  return buffer.toString();
+}
+
+/// Converts a `hyphen-case` [input] string to `'Title Case'`.
+String toTitleCase(String input) {
+  final result = input.replaceAllMapped(
+    _matcher,
+    (m) => m.group(0).toUpperCase(),
+  );
+  return result[0].toUpperCase() + result.substring(1);
 }
 
 /// Returns a [keyword] with the value of `'X'` removed if necessary.

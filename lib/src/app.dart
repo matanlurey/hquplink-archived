@@ -3,113 +3,100 @@ import 'package:hquplink/models.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
 
-class HQUplinkApp extends StatefulWidget {
-  final bool enableDeveloperMode;
+import 'pages/army_list_page.dart';
+
+/// Represents the application shell for HQ Uplink.
+class AppShell extends StatefulWidget {
+  static ThemeData _buildDefaultTheme() {
+    return ThemeData.dark().copyWith(
+      primaryColor: Colors.blueGrey.shade800,
+      accentColor: Colors.blueGrey.shade400,
+    );
+  }
+
   final Roster initialRoster;
 
-  const HQUplinkApp({
-    this.enableDeveloperMode = const bool.fromEnvironment('dart.vm.product'),
+  const AppShell({
     @required this.initialRoster,
-  })  : assert(enableDeveloperMode != null),
-        assert(initialRoster != null);
+  }) : assert(initialRoster != null);
 
   @override
-  createState() => _HQUplinkAppState(roster: initialRoster);
+  createState() {
+    return _AppShellState(
+      roster: initialRoster,
+      theme: _buildDefaultTheme(),
+    );
+  }
 }
 
-class _HQUplinkAppState extends State<HQUplinkApp> {
+class _AppShellState extends State<AppShell> {
+  /// Army lists to be displayed for the current device or user.
   Roster roster;
 
-  _HQUplinkAppState({
+  /// Theme used for the application.
+  ThemeData theme;
+
+  _AppShellState({
     @required this.roster,
-  });
+    @required this.theme,
+  })  : assert(roster != null),
+        assert(theme != null);
+
+  void updateRoster(void Function(RosterBuilder) update) {
+    setState(() {
+      roster = roster.rebuild(update);
+    });
+  }
+
+  void addNewArmy(BuildContext context) async {
+    final catalog = getCatalog(context);
+    final army = await Navigator.push(
+      context,
+      MaterialPageRoute<Army>(
+        builder: (_) {
+          return CreateArmyDialog(
+            initialData: catalog.createArmy(),
+          );
+        },
+        fullscreenDialog: true,
+      ),
+    );
+    if (army != null) {
+      setState(() {
+        roster = (roster.toBuilder()..armies.add(army)).build();
+      });
+    }
+  }
 
   @override
   build(_) {
     return MaterialApp(
       title: 'HQ Uplink',
-      theme: ThemeData.dark().copyWith(
-        primaryColor: Colors.blueGrey.shade800,
-        accentColor: Colors.blueGrey.shade400,
+      theme: theme,
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('HQ Uplink'),
+        ),
+        floatingActionButton: Builder(
+          builder: (context) {
+            return FloatingActionButton(
+              child: const Icon(Icons.add),
+              foregroundColor: Colors.white,
+              onPressed: () => addNewArmy(context),
+            );
+          },
+        ),
+        body: ArmyListPage(
+          armies: roster.armies,
+          onUpdate: (armies) {
+            setState(() {
+              final builder = roster.toBuilder()..armies.clear();
+              builder.armies.addAll(armies);
+              roster = builder.build();
+            });
+          },
+        ),
       ),
-      home: Builder(
-        builder: (context) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('HQ Uplink'),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () => _onAddArmyPressed(context),
-                ),
-              ],
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(8),
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  final army = roster.armies[index];
-                  return Card(
-                    child: PreviewArmyTile(
-                      army: army,
-                      onDismiss: () {
-                        _setRoster(
-                          roster.rebuild((b) => b.armies.removeAt(index)),
-                        );
-                      },
-                      onDeleted: () async {
-                        _saveRoster();
-                      },
-                      onRestore: () {
-                        _setRoster(
-                          roster.rebuild((b) => b.armies.insert(index, army)),
-                        );
-                      },
-                      onUpdate: (updated) {
-                        _setRoster(
-                          roster.rebuild((b) => b.armies[index] = updated),
-                        );
-                        _saveRoster();
-                      },
-                    ),
-                  );
-                },
-                itemCount: roster.armies.length,
-              ),
-            ),
-          );
-        },
-      ),
-      debugShowCheckedModeBanner: widget.enableDeveloperMode,
-    );
-  }
-
-  void _onAddArmyPressed(BuildContext context) async {
-    final catalog = getCatalog(context);
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute<Army>(
-        builder: (_) => AddArmyDialog(initialData: catalog.createArmy()),
-        fullscreenDialog: true,
-      ),
-    );
-    if (result != null) {
-      _setRoster(roster.rebuild((b) => b.armies.insert(0, result)));
-      _saveRoster();
-    }
-  }
-
-  void _setRoster(Roster newRoster) {
-    setState(() {
-      roster = newRoster;
-    });
-  }
-
-  void _saveRoster() async {
-    await const JsonStorage().saveJson(
-      roster,
-      Roster.serializer,
-      'roster.json',
     );
   }
 }
