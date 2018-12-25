@@ -9,6 +9,7 @@ export 'src/widgets/icons/faction_icon.dart';
 export 'src/widgets/icons/rank_icon.dart';
 export 'src/widgets/icons/unit_icon.dart';
 export 'src/widgets/icons/upgrade_icon.dart';
+export 'src/widgets/misc/army_sliver_header.dart';
 export 'src/widgets/misc/max_points_slider.dart';
 
 final _matcher = RegExp(r'[_.\- ]+(\w|$)');

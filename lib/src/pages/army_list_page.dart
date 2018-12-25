@@ -87,7 +87,6 @@ class ArmyListPage extends StatelessWidget {
                   },
                 );
               },
-              fullscreenDialog: true,
             ),
           );
         },

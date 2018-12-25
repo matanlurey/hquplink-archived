@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
-import 'package:hquplink/services.dart';
+import 'package:hquplink/pages.dart';
 import 'package:hquplink/widgets.dart';
 
 /// Renders, and optionally, provides edits for a specific [Army].
@@ -26,6 +26,7 @@ class _ArmyViewState extends State<ArmyViewPage> {
   @override
   initState() {
     army = widget.army.toBuilder();
+
     super.initState();
   }
 
@@ -34,44 +35,33 @@ class _ArmyViewState extends State<ArmyViewPage> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 128,
-            backgroundColor: factionColor(army.faction),
-            flexibleSpace: FlexibleSpaceBar(
-              background: _FactionDecoration(
-                faction: army.faction,
+          ArmySliverHeader<_ArmyMenuAction>(
+            army: army.build(),
+            menu: const [
+              PopupMenuItem(
+                child: ListTile(
+                  leading: const Icon(Icons.edit),
+                  title: const Text('Edit Details'),
+                ),
               ),
-            ),
-            actions: [
-              PopupMenuButton<_ArmyViewAction>(
-                itemBuilder: (context) {
-                  return const [
-                    PopupMenuItem(
-                      child: Text('Edit'),
-                      value: _ArmyViewAction.editArmy,
-                    ),
-                    PopupMenuItem(
-                      child: Text('Delete'),
-                      value: _ArmyViewAction.deleteArmy,
-                    ),
-                  ];
-                },
-                onSelected: (action) {
-                  switch (action) {
-                    case _ArmyViewAction.deleteArmy:
-                      return _deleteArmy();
-                    case _ArmyViewAction.editArmy:
-                      return _editArmy(context);
-                  }
-                },
+              PopupMenuItem(
+                child: ListTile(
+                  leading: const Icon(Icons.delete),
+                  title: const Text('Delete Army'),
+                ),
               ),
             ],
-            title: Text(army.name),
-            bottom: PreferredSize(
-              preferredSize: const Size(0, 6),
-              child: _ArmyHeader(army: army.build()),
-            ),
+            onMenuPressed: (option) {
+              switch (option) {
+                case _ArmyMenuAction.delete:
+                  return _deleteArmy();
+                case _ArmyMenuAction.edit:
+                  return _editArmy(context);
+              }
+            },
+          ),
+          const SliverList(
+            delegate: SliverChildListDelegate([]),
           ),
         ],
       ),
@@ -79,12 +69,23 @@ class _ArmyViewState extends State<ArmyViewPage> {
         child: const Icon(Icons.add),
         backgroundColor: factionColor(army.faction),
         foregroundColor: Colors.white,
-        onPressed: () {},
+        onPressed: _addUnit,
       ),
     );
   }
 
-  void _addUnit() {}
+  void _addUnit() {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) {
+          return UnitCreatePage(
+            army: army.build(),
+          );
+        },
+      ),
+    );
+  }
 
   void _editArmy(BuildContext context) async {
     final edited = await Navigator.push(
@@ -105,7 +106,6 @@ class _ArmyViewState extends State<ArmyViewPage> {
         army = edited.toBuilder();
       });
     }
-    Navigator.pop(context);
   }
 
   void _deleteArmy() {
@@ -114,83 +114,7 @@ class _ArmyViewState extends State<ArmyViewPage> {
   }
 }
 
-class _FactionDecoration extends StatelessWidget {
-  final Faction faction;
-
-  _FactionDecoration({
-    @required this.faction,
-  }) : super(key: ValueKey(faction));
-
-  @override
-  build(context) {
-    return Stack(
-      children: [
-        Padding(
-          child: FactionIcon(
-            faction,
-            fit: BoxFit.scaleDown,
-            color: Color.lerp(
-              factionColor(faction),
-              Colors.white,
-              0.25,
-            ),
-          ),
-          padding: const EdgeInsets.fromLTRB(0, 20, 0, 8),
-        ),
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment(0.0, -1.0),
-              end: Alignment(0.0, -0.4),
-              colors: <Color>[Color(0x60000000), Color(0x00000000)],
-            ),
-          ),
-        ),
-      ],
-      fit: StackFit.expand,
-    );
-  }
-}
-
-enum _ArmyViewAction {
-  editArmy,
-  deleteArmy,
-}
-
-class _ArmyHeader extends StatelessWidget {
-  final Army army;
-
-  const _ArmyHeader({
-    @required this.army,
-  });
-
-  @override
-  build(context) {
-    final catalog = getCatalog(context);
-    final theme = Theme.of(context);
-    final sumPoints = catalog.sumArmyPoints(army);
-    final withinMax = army.maxPoints == null || sumPoints <= army.maxPoints;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 4,
-      ),
-      child: Row(
-        children: [
-          Row(
-            children: [
-              Text('${catalog.sumArmyPoints(army)}'),
-              Text(
-                ' / ${army.maxPoints ?? '∞'}',
-                style: withinMax ? null : TextStyle(color: theme.errorColor),
-              ),
-              const Text(' Points'),
-            ],
-          ),
-          Text('${army.units.length} Activations'),
-        ],
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      ),
-    );
-  }
+enum _ArmyMenuAction {
+  edit,
+  delete,
 }
