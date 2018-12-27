@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
+import 'package:hquplink/pages.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
-
-import 'pages/army_list_page.dart';
 
 /// Represents the application shell for HQ Uplink.
 class AppShell extends StatefulWidget {
@@ -86,7 +85,7 @@ class _AppShellState extends State<AppShell> {
             );
           },
         ),
-        body: ArmyListPage(
+        body: ListArmiesPage(
           armies: roster.armies,
           onUpdate: (armies) {
             setState(() {

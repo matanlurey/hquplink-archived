@@ -6,14 +6,14 @@ import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
 
 /// Renders a collection of [Army]s.
-class ArmyListPage extends StatelessWidget {
+class ListArmiesPage extends StatelessWidget {
   /// Lists of armies to display.
   final BuiltList<Army> armies;
 
   /// Optional; if defined, allows [armies] to be edited.
   final void Function(BuiltList<Army>) onUpdate;
 
-  const ArmyListPage({
+  const ListArmiesPage({
     @required this.armies,
     this.onUpdate,
   }) : assert(armies != null);
@@ -75,7 +75,7 @@ class ArmyListPage extends StatelessWidget {
             context,
             MaterialPageRoute<void>(
               builder: (context) {
-                return ArmyViewPage(
+                return ViewArmyPage(
                   army: army,
                   onUpdate: (newArmy) {
                     if (newArmy == null) {
@@ -145,31 +145,13 @@ class _ArmyListTile extends StatelessWidget {
     if (onDismiss != null) {
       tile = Dismissible(
         key: Key(army.id),
-        background: const _DismissBackground(),
+        background: const DismissBackground(),
         child: tile,
         onDismissed: (_) => onDismiss(),
         direction: DismissDirection.startToEnd,
       );
     }
     return Card(child: tile);
-  }
-}
-
-class _DismissBackground extends StatelessWidget {
-  const _DismissBackground();
-
-  @override
-  build(context) {
-    final theme = Theme.of(context);
-    return Container(
-      color: theme.primaryColor,
-      child: Row(
-        children: const [
-          Icon(Icons.delete),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-    );
   }
 }
 

@@ -1,3 +1,3 @@
-export 'src/pages/add_unit_page.dart';
-export 'src/pages/army_list_page.dart';
-export 'src/pages/army_view_page.dart';
+export 'src/pages/list_armies_page.dart';
+export 'src/pages/view_army_page.dart';
+export 'src/pages/view_unit_page.dart';

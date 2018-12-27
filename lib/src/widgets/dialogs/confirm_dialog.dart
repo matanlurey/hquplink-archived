@@ -37,7 +37,7 @@ class _ConfirmDialog extends StatelessWidget {
   @override
   build(context) {
     return AlertDialog(
-      content: Text(discardText),
+      content: Text(title),
       actions: [
         FlatButton(
           child: Text(cancelText.toUpperCase()),
