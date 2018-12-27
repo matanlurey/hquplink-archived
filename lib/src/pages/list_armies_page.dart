@@ -2,74 +2,61 @@ import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/pages.dart';
+import 'package:hquplink/patterns.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
 
 /// Renders a collection of [Army]s.
-class ListArmiesPage extends StatelessWidget {
-  /// Lists of armies to display.
-  final BuiltList<Army> armies;
+class ListArmiesPage extends StatefulWidget {
+  /// Initial list of armies to display.
+  ///
+  /// Subsequent updates, if any, are handled locally and via [onUpdate].
+  final BuiltList<Army> initialArmies;
 
-  /// Optional; if defined, allows [armies] to be edited.
+  /// Optional; if defined, allows [initialArmies] to be edited.
   final void Function(BuiltList<Army>) onUpdate;
 
   const ListArmiesPage({
-    @required this.armies,
+    @required this.initialArmies,
     this.onUpdate,
-  }) : assert(armies != null);
+  }) : assert(initialArmies != null);
 
-  /// Whether [onUpdate] was provided.
-  bool get isEditable => onUpdate != null;
+  @override
+  createState() => _ListArmiesState();
+}
+
+class _ListArmiesState extends Mutex<BuiltList<Army>, ListArmiesPage> {
+  @override
+  initMutex(widget) => widget.initialArmies;
+
+  @override
+  onUpdate(newValue, widget) => widget.onUpdate(newValue);
 
   void _dismissArmy(Army army, {BuildContext allowUndo}) {
-    final builder = armies.toBuilder();
-    final index = armies.indexOf(army);
-    builder.removeAt(index);
-
-    onUpdate(builder.build());
-
-    if (allowUndo != null) {
-      _promptUndo(allowUndo, builder, army, index);
-    }
-  }
-
-  void _promptUndo(
-    BuildContext context,
-    ListBuilder<Army> list,
-    Army army,
-    int index,
-  ) {
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Deleted ${army.name}'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            list.insert(index, army);
-            onUpdate(list.build());
-          },
-        ),
-      ),
+    setValue(
+      value.rebuild((b) => b.remove(army)),
+      notifyRevert: allowUndo,
+      describeRevert: (_) => 'Removed ${army.name}',
     );
   }
 
   void _reorderArmy(int oldIndex, int newIndex) {
-    if (newIndex > oldIndex) {
-      // ignore: parameter_assignments
-      newIndex--;
-    }
-    final builder = armies.toBuilder();
-    builder.insert(newIndex, builder.removeAt(oldIndex));
-    onUpdate(builder.build());
+    setValue(
+      value.rebuild((b) {
+        return b.insert(
+          newIndex > oldIndex ? newIndex - 1 : newIndex,
+          b.removeAt(oldIndex),
+        );
+      }),
+    );
   }
 
   @override
   build(context) {
-    final children = armies.map((army) {
+    final children = value.map((army) {
       return _ArmyListTile(
         army: army,
-        onDismiss:
-            isEditable ? () => _dismissArmy(army, allowUndo: context) : null,
+        onDismiss: () => _dismissArmy(army, allowUndo: context),
         onPressed: () {
           Navigator.push(
             context,
@@ -81,9 +68,9 @@ class ListArmiesPage extends StatelessWidget {
                     if (newArmy == null) {
                       return _dismissArmy(army);
                     }
-                    final builder = armies.toBuilder();
-                    builder[armies.indexOf(army)] = newArmy;
-                    onUpdate(builder.build());
+                    setValue(value.rebuild((b) {
+                      b[value.indexOf(army)] = newArmy;
+                    }));
                   },
                 );
               },
@@ -92,14 +79,10 @@ class ListArmiesPage extends StatelessWidget {
         },
       );
     }).toList();
-    final listView = isEditable
-        ? ReorderableListView(
-            children: children,
-            onReorder: _reorderArmy,
-          )
-        : ListView(
-            children: children,
-          );
+    final listView = ReorderableListView(
+      children: children,
+      onReorder: _reorderArmy,
+    );
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: listView,

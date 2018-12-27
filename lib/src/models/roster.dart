@@ -6,6 +6,9 @@ import 'package:swlegion/swlegion.dart';
 
 part 'roster.g.dart';
 
+/// JSON serialization capability for the data model.
+///
+/// This adds to the serializers from `package:swlegion`.
 final Serializers rosterSerializers = () {
   final builder = serializers.toBuilder();
 

@@ -13,7 +13,7 @@ class ViewUnitPage extends StatefulWidget {
 
   const ViewUnitPage({
     @required this.unit,
-    this.onUpdate,
+    @required this.onUpdate,
   }) : assert(unit != null);
 
   @override
@@ -21,10 +21,18 @@ class ViewUnitPage extends StatefulWidget {
 }
 
 class _ViewUnitState extends State<ViewUnitPage> {
+  ArmyUnit unit;
+
+  @override
+  initState() {
+    unit = widget.unit;
+    super.initState();
+  }
+
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final details = catalog.lookupUnit(widget.unit.unit);
+    final details = catalog.lookupUnit(unit.unit);
     final isVehicle = const [
       UnitType.groundVehicle,
       UnitType.repulsorVehicle,
@@ -47,7 +55,7 @@ class _ViewUnitState extends State<ViewUnitPage> {
             title: details.name,
             onMenuPressed: (_) {},
             bottom: _ViewUnitHeader(
-              unit: widget.unit,
+              unit: unit,
             ),
           ),
           SliverList(
@@ -87,14 +95,21 @@ class _ViewUnitState extends State<ViewUnitPage> {
                     Card(
                       child: _ViewUnitCard(
                         title: const Text('Keywords'),
-                        body: _ViewUnitKeywords(unit: widget.unit),
+                        body: _ViewUnitKeywords(unit: unit),
                       ),
                     ),
                     Card(
                       child: _ViewUnitCard(
                         title: const Text('Upgrades'),
-                        body: _ViewUnitUpgrades(
-                          unit: widget.unit,
+                        body: Builder(
+                          builder: (context) {
+                            return _ViewUnitUpgrades(
+                              unit: unit,
+                              onDelete: (upgrade) {
+                                return _deleteUpgrade(context, upgrade);
+                              },
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -102,7 +117,7 @@ class _ViewUnitState extends State<ViewUnitPage> {
                       child: _ViewUnitCard(
                         title: const Text('Weapons'),
                         body: _ViewUnitWeapons(
-                          unit: widget.unit,
+                          unit: unit,
                         ),
                       ),
                     ),
@@ -112,6 +127,32 @@ class _ViewUnitState extends State<ViewUnitPage> {
             ]),
           ),
         ],
+      ),
+    );
+  }
+
+  void _deleteUpgrade(BuildContext context, Upgrade upgrade) {
+    final oldUnit = unit;
+    final builder = oldUnit.toBuilder();
+    final wasRemoved = builder.upgrades.remove(upgrade.toRef());
+    assert(wasRemoved);
+    final newUnit = builder.build();
+    setState(() => unit = newUnit);
+    widget.onUpdate(newUnit);
+    _promptUndo(context, upgrade, oldUnit);
+  }
+
+  void _promptUndo(BuildContext context, Upgrade upgrade, ArmyUnit oldUnit) {
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Removed ${upgrade.name}'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            setState(() => unit = oldUnit);
+            widget.onUpdate(oldUnit);
+          },
+        ),
       ),
     );
   }
@@ -299,9 +340,11 @@ class _ViewUnitKeywords extends StatelessWidget {
 
 class _ViewUnitUpgrades extends StatelessWidget {
   final ArmyUnit unit;
+  final void Function(Upgrade) onDelete;
 
   const _ViewUnitUpgrades({
     @required this.unit,
+    @required this.onDelete,
   });
 
   @override
@@ -313,9 +356,13 @@ class _ViewUnitUpgrades extends StatelessWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.all(0),
       children: ListTile.divideTiles(
-        tiles: upgrades.map(
-          (upgrade) {
-            return ListTile(
+        tiles: upgrades.map((upgrade) {
+          return Dismissible(
+            key: Key(upgrade.id),
+            background: const DismissBackground(),
+            direction: DismissDirection.startToEnd,
+            onDismissed: (_) => onDelete(upgrade),
+            child: ListTile(
               contentPadding: const EdgeInsets.all(0),
               trailing: UpgradeAvatar(upgrade),
               title: Text(
@@ -328,9 +375,9 @@ class _ViewUnitUpgrades extends StatelessWidget {
               // TODO: Add navigation for details of the upgrade.
               // And/or consider a points box here like previous page.
               // TODO: Add exhaustible icon.
-            );
-          },
-        ),
+            ),
+          );
+        }),
         context: context,
       ).toList(),
     );
@@ -346,54 +393,42 @@ class _ViewUnitWeapons extends StatelessWidget {
 
   @override
   build(context) {
-    final catalog = getCatalog(context);
-    final details = catalog.lookupUnit(unit.unit);
-    final upgrades = unit.upgrades
-        .map(catalog.lookupUpgrade)
-        .map((u) => u.weapon)
-        .where((w) => w != null);
-    final weapons = details.weapons.toList()..addAll(upgrades);
     return ListView(
       primary: false,
       shrinkWrap: true,
       padding: const EdgeInsets.all(0),
       children: ListTile.divideTiles(
         context: context,
-        tiles: weapons.map((weapon) {
+        tiles: WeaponView.all(getCatalog(context), unit).map((weapon) {
+          var subtitle = '(${weapon.miniatures}) ${weapon.range}';
+          if (weapon.keyword.isNotEmpty) {
+            subtitle = '$subtitle: ${weapon.keyword}';
+          }
           return ListTile(
             title: Text(
               weapon.name,
               overflow: TextOverflow.ellipsis,
             ),
             contentPadding: const EdgeInsets.all(0),
-            trailing: _buildDice(weapon),
-            subtitle: Text(weapon.keywords.entries.map((e) {
-              var text = formatKeyword(e.key);
-              if (e.value.isNotEmpty) {
-                text += ' ${e.value}';
-              }
-              return text;
-            }).join(', ')),
+            trailing: _buildDice(weapon.dice),
+            subtitle: Text(subtitle),
           );
         }),
       ).toList(),
     );
   }
 
-  Widget _buildDice(Weapon weapon) {
-    final dice = <Widget>[];
-    weapon.dice.forEach((type, amount) {
-      for (var i = 0; i < amount; i++) {
-        dice.add(Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: SizedBox(
-            width: 10,
-            height: 10,
-            child: AttackDiceIcon(type),
-          ),
-        ));
-      }
-    });
+  Widget _buildDice(Iterable<AttackDice> display) {
+    final dice = display.map((d) {
+      return Padding(
+        padding: const EdgeInsets.only(right: 8),
+        child: SizedBox(
+          width: 10,
+          height: 10,
+          child: AttackDiceIcon(d),
+        ),
+      );
+    }).toList();
     return Column(
       children: [
         Row(

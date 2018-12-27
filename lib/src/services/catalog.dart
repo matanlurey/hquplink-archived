@@ -90,6 +90,13 @@ class Catalog {
     return upgrades.fold(unit.points, (p, u) => p + u.points);
   }
 
+  /// Returns the sum of all miniatures in the provided [armyUnit].
+  int sumMiniatures(ArmyUnit armyUnit) {
+    return armyUnit.upgrades.map(lookupUpgrade).fold(
+        lookupUnit(armyUnit.unit).miniatures,
+        (p, u) => p + (u.addsMiniature ? 1 : 0));
+  }
+
   /// Returns [Unit]s that can be added to an army of [faction].
   Iterable<Unit> unitsForFaction(Faction faction) {
     return units.where((f) => f.faction == faction);

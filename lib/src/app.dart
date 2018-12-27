@@ -86,7 +86,7 @@ class _AppShellState extends State<AppShell> {
           },
         ),
         body: ListArmiesPage(
-          armies: roster.armies,
+          initialArmies: roster.armies,
           onUpdate: (armies) {
             setState(() {
               final builder = roster.toBuilder()..armies.clear();

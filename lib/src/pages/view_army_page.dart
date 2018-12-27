@@ -93,7 +93,7 @@ class _ArmyViewState extends State<ViewArmyPage> {
     // TODO: Use CustomScrollView or ReorderableListView when shrinkWrap'd.
     // (https://github.com/flutter/flutter/issues/25789)
     return ListView(
-      children: army.units.map((unit) {
+      children: mapIndexed<Widget, ArmyUnit>(army.units, (index, unit) {
         return Card(
           child: Dismissible(
             key: Key(unit.id),
@@ -103,9 +103,17 @@ class _ArmyViewState extends State<ViewArmyPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute<void>(
-                    builder: (_) => ViewUnitPage(unit: unit),
-                  ),
+                  MaterialPageRoute<void>(builder: (_) {
+                    return ViewUnitPage(
+                      unit: unit,
+                      onUpdate: (unit) {
+                        final builder = army.toBuilder()..units[index] = unit;
+                        final newArmy = builder.build();
+                        widget.onUpdate(newArmy);
+                        setState(() => army = newArmy);
+                      },
+                    );
+                  }),
                 );
               },
             ),
