@@ -1,4 +1,4 @@
-import 'src/mains/run.dart';
+import 'src/mains/fake.dart' as fake;
 
 /// Default entrypoint.
-void main() => run();
+void main() => fake.main();

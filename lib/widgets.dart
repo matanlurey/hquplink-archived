@@ -46,7 +46,7 @@ String toTitleCase(String input) {
 ///
 /// For example, `formatKeyword(Keyword.impactX)` returns `'Impact'`.
 String formatKeyword(Keyword keyword) {
-  final word = toTitleCase(keyword.name);
+  final word = toTitleCase(keyword.name).replaceAll('-', ' ');
   if (word.endsWith(' X')) {
     return '${word.substring(0, word.length - 2)}';
   }

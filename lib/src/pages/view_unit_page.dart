@@ -283,16 +283,12 @@ class _ViewUnitKeywords extends StatelessWidget {
         context: context,
         tiles: keywords.entries.map(
           (e) {
-            // TODO: Fix formatting.
-            var text = formatKeyword(e.key).replaceAll('-', ' ');
-            if (e.value != null) {
-              text += ' ${e.value}';
-            }
             return ListTile(
-              title: Text(text),
-              subtitle: Text(e.key.description),
-              // TODO: Add icon(s) for keywords.
-              contentPadding: const EdgeInsets.symmetric(vertical: 8),
+              title: Text(
+                '${formatKeyword(e.key)} ${e.value}',
+              ),
+              contentPadding: const EdgeInsets.all(0),
+              trailing: const Icon(Icons.chevron_right),
             );
           },
         ),
@@ -311,27 +307,32 @@ class _ViewUnitUpgrades extends StatelessWidget {
   @override
   build(context) {
     final catalog = getCatalog(context);
+    final upgrades = unit.upgrades.map(catalog.lookupUpgrade);
     return ListView(
       primary: false,
       shrinkWrap: true,
       padding: const EdgeInsets.all(0),
-      children: unit.upgrades.map(catalog.lookupUpgrade).map((upgrade) {
-        return ListTile(
-          contentPadding: const EdgeInsets.all(0),
-          leading: UpgradeAvatar(upgrade),
-          title: Text(upgrade.name),
-          subtitle: Text(
-            '${toTitleCase(upgrade.type.name)}, ${upgrade.points} Points',
-          ),
-          // TODO: Add navigation for details of the upgrade.
-          // And/or consider a points box here like previous page.
-          trailing: const IconButton(
-            icon: Icon(Icons.chevron_right),
-            onPressed: null,
-          ),
-          // TODO: Add exhaustible icon.
-        );
-      }).toList(),
+      children: ListTile.divideTiles(
+        tiles: upgrades.map(
+          (upgrade) {
+            return ListTile(
+              contentPadding: const EdgeInsets.all(0),
+              trailing: UpgradeAvatar(upgrade),
+              title: Text(
+                upgrade.name,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                '${toTitleCase(upgrade.type.name)}, ${upgrade.points} Points',
+              ),
+              // TODO: Add navigation for details of the upgrade.
+              // And/or consider a points box here like previous page.
+              // TODO: Add exhaustible icon.
+            );
+          },
+        ),
+        context: context,
+      ).toList(),
     );
   }
 }
@@ -352,59 +353,63 @@ class _ViewUnitWeapons extends StatelessWidget {
         .map((u) => u.weapon)
         .where((w) => w != null);
     final weapons = details.weapons.toList()..addAll(upgrades);
-    final theme = Theme.of(context);
-    return Column(
-      children: weapons.map((weapon) {
-        final dice = <Widget>[];
-        weapon.dice.forEach((type, amount) {
-          for (var i = 0; i < amount; i++) {
-            dice.add(Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: SizedBox(
-                width: 10,
-                height: 10,
-                child: AttackDiceIcon(type),
-              ),
-            ));
-          }
-        });
-        final content = [
-          Text(
-            weapon.name,
-            style: theme.primaryTextTheme.subhead,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-            child: Row(
-              children: dice,
+    return ListView(
+      primary: false,
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(0),
+      children: ListTile.divideTiles(
+        context: context,
+        tiles: weapons.map((weapon) {
+          return ListTile(
+            title: Text(
+              weapon.name,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ];
-        if (weapon.keywords.isNotEmpty) {
-          content.add(
-            Text(
-              weapon.keywords.entries.map((e) {
-                // TODO: Fix formatting.
-                var text = formatKeyword(e.key).replaceAll('-', ' ');
-                if (e.value != null) {
-                  text += ' ${e.value}';
-                }
-                return text;
-              }).join(', '),
-            ),
+            contentPadding: const EdgeInsets.all(0),
+            trailing: _buildDice(weapon),
+            subtitle: Text(weapon.keywords.entries.map((e) {
+              var text = formatKeyword(e.key);
+              if (e.value.isNotEmpty) {
+                text += ' ${e.value}';
+              }
+              return text;
+            }).join(', ')),
           );
-        }
-        // TODO: Make press-able to be able to simulate an attack.
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Column(
-            // TODO: Add dividers and/or make easier to read.
-            children: content,
-            crossAxisAlignment: CrossAxisAlignment.start,
+        }),
+      ).toList(),
+    );
+  }
+
+  Widget _buildDice(Weapon weapon) {
+    final dice = <Widget>[];
+    weapon.dice.forEach((type, amount) {
+      for (var i = 0; i < amount; i++) {
+        dice.add(Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: SizedBox(
+            width: 10,
+            height: 10,
+            child: AttackDiceIcon(type),
           ),
-        );
-      }).toList(),
-      crossAxisAlignment: CrossAxisAlignment.start,
+        ));
+      }
+    });
+    return Column(
+      children: [
+        Row(
+          children: dice.take(3).toList(),
+          mainAxisSize: MainAxisSize.min,
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: dice.length > 3 ? 8 : 0),
+          child: Row(
+            children: dice.skip(3).toList(),
+            mainAxisSize: MainAxisSize.min,
+          ),
+        ),
+      ],
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
     );
   }
 }
