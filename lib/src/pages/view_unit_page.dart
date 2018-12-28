@@ -37,15 +37,19 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
       UnitType.repulsorVehicle,
     ].contains(details.type);
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        backgroundColor: Color.lerp(
-          factionColor(details.faction),
-          Colors.white,
-          0.25,
-        ),
-        foregroundColor: Colors.white,
-        onPressed: () {},
+      floatingActionButton: Builder(
+        builder: (context) {
+          return FloatingActionButton(
+            child: const Icon(Icons.add),
+            backgroundColor: Color.lerp(
+              factionColor(details.faction),
+              Colors.white,
+              0.25,
+            ),
+            foregroundColor: Colors.white,
+            onPressed: () => _addUpgrade(context),
+          );
+        },
       ),
       body: CustomScrollView(
         slivers: [
@@ -128,6 +132,18 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
         ],
       ),
     );
+  }
+
+  void _addUpgrade(BuildContext context) async {
+    final upgrade = await showDialog<Upgrade>(
+      context: context,
+      builder: (_) => _AddUpgradeDialog(unit: value),
+    );
+    if (upgrade != null) {
+      setValue(
+        value.rebuild((b) => b.upgrades.add(upgrade.toRef())),
+      );
+    }
   }
 
   void _deleteUpgrade(BuildContext context, Upgrade upgrade) {
@@ -426,6 +442,56 @@ class _ViewUnitWeapons extends StatelessWidget {
       ],
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
+    );
+  }
+}
+
+class _AddUpgradeDialog extends StatelessWidget {
+  final ArmyUnit unit;
+
+  const _AddUpgradeDialog({
+    @required this.unit,
+  }) : assert(unit != null);
+
+  @override
+  build(context) {
+    final catalog = getCatalog(context);
+    final details = catalog.lookupUnit(unit.unit);
+    final upgrades = details.upgrades.keys
+        .map(catalog.upgradesForSlot)
+        .expand((i) => i)
+        .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
+
+    // TODO: Refactor this nightmare.
+    // TODO: Also disable adding upgrades entirely if maxed out.
+    bool isValid(Upgrade upgrade) =>
+        unit.upgrades
+                .map(catalog.lookupUpgrade)
+                .map((u) => u.type == upgrade.type)
+                .length <
+            details.upgrades[upgrade.type] &&
+        !unit.upgrades.any((u) => u.id == upgrade.id);
+
+    return SimpleDialog(
+      children: upgrades.map((upgrade) {
+        return ListTile(
+          leading: UpgradeAvatar(upgrade),
+          title: Text(
+            upgrade.name,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(toTitleCase(upgrade.type.name)),
+          trailing: Text('${upgrade.points}'),
+          enabled: isValid(upgrade),
+          onTap: isValid(upgrade)
+              ? () {
+                  Navigator.pop(context, upgrade);
+                }
+              : null,
+        );
+      }).toList(),
+      title: const Text('Add Upgrade'),
     );
   }
 }

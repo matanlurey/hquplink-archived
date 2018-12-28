@@ -72,15 +72,19 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        backgroundColor: Color.lerp(
-          factionColor(value.faction),
-          Colors.white,
-          0.25,
-        ),
-        foregroundColor: Colors.white,
-        onPressed: _addUnit,
+      floatingActionButton: Builder(
+        builder: (context) {
+          return FloatingActionButton(
+            child: const Icon(Icons.add),
+            backgroundColor: Color.lerp(
+              factionColor(value.faction),
+              Colors.white,
+              0.25,
+            ),
+            foregroundColor: Colors.white,
+            onPressed: () => _addUnit(context),
+          );
+        },
       ),
     );
   }
@@ -88,8 +92,9 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
   Widget _buildList(BuildContext context) {
     // TODO: Use CustomScrollView or ReorderableListView when shrinkWrap'd.
     // (https://github.com/flutter/flutter/issues/25789)
-    return ListView(
-      children: mapIndexed<Widget, ArmyUnit>(value.units, (index, unit) {
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        final unit = value.units[index];
         return Card(
           child: Dismissible(
             key: Key(unit.id),
@@ -115,14 +120,24 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
             direction: DismissDirection.startToEnd,
           ),
         );
-      }).toList(),
+      },
+      itemCount: value.units.length,
       padding: const EdgeInsets.all(0),
-      primary: true,
+      primary: false,
       shrinkWrap: true,
     );
   }
 
-  void _addUnit() {}
+  void _addUnit(BuildContext context) async {
+    final added = await showDialog<Unit>(
+      context: context,
+      builder: (_) => _AddUnitDialog(army: value),
+    );
+    if (added != null) {
+      final unit = getCatalog(context).createArmyUnit()..unit = added.toRef();
+      setValue(value.rebuild((b) => b.units.add(unit.build())));
+    }
+  }
 
   void _editArmy(BuildContext context) async {
     final edited = await Navigator.push(
@@ -269,6 +284,49 @@ class _SumPointsBox extends StatelessWidget {
         ),
         constraints: const BoxConstraints(minWidth: 30),
       ),
+    );
+  }
+}
+
+class _AddUnitDialog extends StatelessWidget {
+  final Army army;
+
+  const _AddUnitDialog({
+    @required this.army,
+  }) : assert(army != null);
+
+  @override
+  build(context) {
+    final catalog = getCatalog(context);
+    final units = catalog.unitsForFaction(army.faction).toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
+    final uniques = army.units
+        .map((u) => catalog.lookupUnit(u.unit))
+        .where((u) => u.isUnique)
+        .toSet();
+    bool isValid(Unit u) => !uniques.contains(u);
+    return SimpleDialog(
+      children: units.map((unit) {
+        return ListTile(
+          leading: UnitAvatar(unit),
+          title: Text(
+            unit.name,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: unit.subTitle != null ? Text(unit.subTitle) : null,
+          trailing: _SumPointsBox(
+            points: unit.points,
+            color: factionColor(unit.faction),
+          ),
+          enabled: isValid(unit),
+          onTap: isValid(unit)
+              ? () {
+                  Navigator.pop(context, unit);
+                }
+              : null,
+        );
+      }).toList(),
+      title: const Text('Add Unit'),
     );
   }
 }
