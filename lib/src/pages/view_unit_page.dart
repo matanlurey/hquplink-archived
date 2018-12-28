@@ -26,7 +26,7 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
   initMutex() => widget.unit;
 
   @override
-  onUpdate(value) => widget.onUpdate(value);
+  onUpdate() => widget.onUpdate(value);
 
   @override
   build(context) {

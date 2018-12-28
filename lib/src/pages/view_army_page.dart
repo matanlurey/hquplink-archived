@@ -12,7 +12,7 @@ class ViewArmyPage extends StatefulWidget {
 
   const ViewArmyPage({
     @required this.army,
-    this.onUpdate,
+    @required this.onUpdate,
   }) : assert(army != null);
 
   @override
@@ -24,7 +24,7 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
   initMutex() => widget.army;
 
   @override
-  onUpdate(value) => widget.onUpdate(value);
+  onUpdate() => widget.onUpdate(value);
 
   @override
   build(context) {
@@ -102,8 +102,9 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
                   MaterialPageRoute<void>(builder: (_) {
                     return ViewUnitPage(
                       unit: unit,
-                      onUpdate: (unit) {
-                        setValue(value.rebuild((b) => b..units[index] = unit));
+                      onUpdate: (newUnit) {
+                        setValue(
+                            value.rebuild((b) => b.units[index] = newUnit));
                       },
                     );
                   }),

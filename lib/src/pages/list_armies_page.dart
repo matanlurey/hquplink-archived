@@ -30,7 +30,7 @@ class _ListArmiesState extends Mutex<BuiltList<Army>, ListArmiesPage> {
   initMutex() => widget.initialArmies;
 
   @override
-  onUpdate(newValue) => widget.onUpdate(newValue);
+  onUpdate() => widget.onUpdate(value);
 
   void _dismissArmy(Army army, {BuildContext allowUndo}) {
     setValue(
@@ -57,26 +57,7 @@ class _ListArmiesState extends Mutex<BuiltList<Army>, ListArmiesPage> {
       return _ArmyListTile(
         army: army,
         onDismiss: () => _dismissArmy(army, allowUndo: context),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute<void>(
-              builder: (context) {
-                return ViewArmyPage(
-                  army: army,
-                  onUpdate: (newArmy) {
-                    if (newArmy == null) {
-                      return _dismissArmy(army);
-                    }
-                    setValue(value.rebuild((b) {
-                      b[value.indexOf(army)] = newArmy;
-                    }));
-                  },
-                );
-              },
-            ),
-          );
-        },
+        onPressed: () => _viewArmyDetails(army),
       );
     }).toList();
     final listView = ReorderableListView(
@@ -86,6 +67,33 @@ class _ListArmiesState extends Mutex<BuiltList<Army>, ListArmiesPage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: listView,
+    );
+  }
+
+  void _viewArmyDetails(Army oldArmy) {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) {
+          return ViewArmyPage(
+            army: oldArmy,
+            onUpdate: (newArmy) {
+              if (newArmy == null) {
+                return _dismissArmy(oldArmy);
+              }
+              setValue(
+                value.rebuild((b) {
+                  final index = value.indexOf(oldArmy);
+                  assert(index != -1);
+                  // ignore: parameter_assignments
+                  oldArmy = newArmy;
+                  b[index] = newArmy;
+                }),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
