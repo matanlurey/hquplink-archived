@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
+import 'package:hquplink/patterns.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
 
@@ -20,19 +21,17 @@ class ViewUnitPage extends StatefulWidget {
   createState() => _ViewUnitState();
 }
 
-class _ViewUnitState extends State<ViewUnitPage> {
-  ArmyUnit unit;
+class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
+  @override
+  initMutex() => widget.unit;
 
   @override
-  initState() {
-    unit = widget.unit;
-    super.initState();
-  }
+  onUpdate(value) => widget.onUpdate(value);
 
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final details = catalog.lookupUnit(unit.unit);
+    final details = catalog.lookupUnit(value.unit);
     final isVehicle = const [
       UnitType.groundVehicle,
       UnitType.repulsorVehicle,
@@ -55,7 +54,7 @@ class _ViewUnitState extends State<ViewUnitPage> {
             title: details.name,
             onMenuPressed: (_) {},
             bottom: _ViewUnitHeader(
-              unit: unit,
+              unit: value,
             ),
           ),
           SliverList(
@@ -95,7 +94,7 @@ class _ViewUnitState extends State<ViewUnitPage> {
                     Card(
                       child: _ViewUnitCard(
                         title: const Text('Keywords'),
-                        body: _ViewUnitKeywords(unit: unit),
+                        body: _ViewUnitKeywords(unit: value),
                       ),
                     ),
                     Card(
@@ -104,7 +103,7 @@ class _ViewUnitState extends State<ViewUnitPage> {
                         body: Builder(
                           builder: (context) {
                             return _ViewUnitUpgrades(
-                              unit: unit,
+                              unit: value,
                               onDelete: (upgrade) {
                                 return _deleteUpgrade(context, upgrade);
                               },
@@ -117,7 +116,7 @@ class _ViewUnitState extends State<ViewUnitPage> {
                       child: _ViewUnitCard(
                         title: const Text('Weapons'),
                         body: _ViewUnitWeapons(
-                          unit: unit,
+                          unit: value,
                         ),
                       ),
                     ),
@@ -132,28 +131,10 @@ class _ViewUnitState extends State<ViewUnitPage> {
   }
 
   void _deleteUpgrade(BuildContext context, Upgrade upgrade) {
-    final oldUnit = unit;
-    final builder = oldUnit.toBuilder();
-    final wasRemoved = builder.upgrades.remove(upgrade.toRef());
-    assert(wasRemoved);
-    final newUnit = builder.build();
-    setState(() => unit = newUnit);
-    widget.onUpdate(newUnit);
-    _promptUndo(context, upgrade, oldUnit);
-  }
-
-  void _promptUndo(BuildContext context, Upgrade upgrade, ArmyUnit oldUnit) {
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Removed ${upgrade.name}'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            setState(() => unit = oldUnit);
-            widget.onUpdate(oldUnit);
-          },
-        ),
-      ),
+    setValue(
+      value.rebuild((b) => b.upgrades.remove(upgrade.toRef())),
+      notifyRevert: context,
+      describeRevert: (_) => 'Removed ${upgrade.name}',
     );
   }
 

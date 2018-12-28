@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/pages.dart';
+import 'package:hquplink/patterns.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
 
@@ -18,17 +19,12 @@ class ViewArmyPage extends StatefulWidget {
   createState() => _ArmyViewState();
 }
 
-class _ArmyViewState extends State<ViewArmyPage> {
-  Army army;
-
-  /// Whether [army] should be edited.
-  bool get isEditable => widget.onUpdate != null;
+class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
+  @override
+  initMutex() => widget.army;
 
   @override
-  initState() {
-    army = widget.army;
-    super.initState();
-  }
+  onUpdate(value) => widget.onUpdate(value);
 
   @override
   build(context) {
@@ -36,8 +32,8 @@ class _ArmyViewState extends State<ViewArmyPage> {
       body: CustomScrollView(
         slivers: [
           FactionSliverHeader<_ViewArmyMenuOptions>(
-            title: army.name,
-            faction: army.faction,
+            title: value.name,
+            faction: value.faction,
             menu: const [
               PopupMenuItem(
                 child: ListTile(
@@ -62,7 +58,7 @@ class _ArmyViewState extends State<ViewArmyPage> {
                   return _editArmy(context);
               }
             },
-            bottom: _ViewArmyHeader(army: army),
+            bottom: _ViewArmyHeader(army: value),
           ),
           SliverList(
             delegate: SliverChildListDelegate([
@@ -79,7 +75,7 @@ class _ArmyViewState extends State<ViewArmyPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         backgroundColor: Color.lerp(
-          factionColor(army.faction),
+          factionColor(value.faction),
           Colors.white,
           0.25,
         ),
@@ -93,7 +89,7 @@ class _ArmyViewState extends State<ViewArmyPage> {
     // TODO: Use CustomScrollView or ReorderableListView when shrinkWrap'd.
     // (https://github.com/flutter/flutter/issues/25789)
     return ListView(
-      children: mapIndexed<Widget, ArmyUnit>(army.units, (index, unit) {
+      children: mapIndexed<Widget, ArmyUnit>(value.units, (index, unit) {
         return Card(
           child: Dismissible(
             key: Key(unit.id),
@@ -107,10 +103,7 @@ class _ArmyViewState extends State<ViewArmyPage> {
                     return ViewUnitPage(
                       unit: unit,
                       onUpdate: (unit) {
-                        final builder = army.toBuilder()..units[index] = unit;
-                        final newArmy = builder.build();
-                        widget.onUpdate(newArmy);
-                        setState(() => army = newArmy);
+                        setValue(value.rebuild((b) => b..units[index] = unit));
                       },
                     );
                   }),
@@ -136,7 +129,7 @@ class _ArmyViewState extends State<ViewArmyPage> {
       MaterialPageRoute<Army>(
         builder: (_) {
           return CreateArmyDialog(
-            initialData: army.toBuilder(),
+            initialData: value.toBuilder(),
             editExisting: true,
           );
         },
@@ -144,47 +137,26 @@ class _ArmyViewState extends State<ViewArmyPage> {
       ),
     );
     if (edited != null) {
-      widget.onUpdate(edited);
-      setState(() {
-        army = edited;
-      });
+      setValue(edited);
     }
   }
 
   void _deleteUnit(BuildContext context, ArmyUnit unit) {
-    final oldArmy = army;
-    final newArmy = (oldArmy.toBuilder()..units.remove(unit)).build();
-    assert(newArmy.units.length == oldArmy.units.length - 1);
-    setState(() {
-      army = newArmy;
-    });
-    widget.onUpdate(army);
-    _promptUndo(context, getCatalog(context).lookupUnit(unit.unit), oldArmy);
-  }
-
-  void _promptUndo(BuildContext context, Unit oldUnit, Army oldArmy) {
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Deleted ${oldUnit.name}'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            setState(() {
-              army = oldArmy;
-            });
-            widget.onUpdate(army);
-          },
-        ),
-      ),
+    final catalog = getCatalog(context);
+    final details = catalog.lookupUnit(unit.unit);
+    setValue(
+      value.rebuild((b) => b.units.remove(unit)),
+      notifyRevert: context,
+      describeRevert: (_) => 'Removed ${details.name}',
     );
   }
 
   void _deleteArmy(BuildContext context) async {
-    if (army.units.isNotEmpty || army.commands.isNotEmpty) {
+    if (value.units.isNotEmpty || value.commands.isNotEmpty) {
       if (!await showConfirmDialog(
         context: context,
         discardText: 'Delete',
-        title: 'Delete ${army.name}?',
+        title: 'Delete ${value.name}?',
       )) {
         return;
       }

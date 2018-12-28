@@ -16,7 +16,7 @@ abstract class Mutex<T, Y extends StatefulWidget> extends State<Y> {
     BuildContext notifyRevert,
   }) {
     setState(() => _value = value);
-    onUpdate(value, widget);
+    onUpdate(value);
     if (notifyRevert != null) {
       assert(describeRevert != null);
       _promptUndo(notifyRevert, describeRevert(value), value);
@@ -39,7 +39,7 @@ abstract class Mutex<T, Y extends StatefulWidget> extends State<Y> {
 
   @override
   initState() {
-    _value = initMutex(widget);
+    _value = initMutex();
     super.initState();
   }
 
@@ -48,10 +48,10 @@ abstract class Mutex<T, Y extends StatefulWidget> extends State<Y> {
   /// Updates should be provided via `=`.
   @protected
   @visibleForOverriding
-  void onUpdate(T newValue, Y widget);
+  void onUpdate(T newValue);
 
   /// Override to provide the initial mutable value, often from the parent [widget].
   @protected
   @visibleForOverriding
-  T initMutex(Y widget);
+  T initMutex();
 }

@@ -27,10 +27,10 @@ class ListArmiesPage extends StatefulWidget {
 
 class _ListArmiesState extends Mutex<BuiltList<Army>, ListArmiesPage> {
   @override
-  initMutex(widget) => widget.initialArmies;
+  initMutex() => widget.initialArmies;
 
   @override
-  onUpdate(newValue, widget) => widget.onUpdate(newValue);
+  onUpdate(newValue) => widget.onUpdate(newValue);
 
   void _dismissArmy(Army army, {BuildContext allowUndo}) {
     setValue(
