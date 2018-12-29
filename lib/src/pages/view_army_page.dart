@@ -298,13 +298,8 @@ class _AddUnitDialog extends StatelessWidget {
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final units = catalog.unitsForFaction(army.faction).toList()
+    final units = catalog.unitsForArmy(army).toList()
       ..sort((a, b) => a.name.compareTo(b.name));
-    final uniques = army.units
-        .map((u) => catalog.lookupUnit(u.unit))
-        .where((u) => u.isUnique)
-        .toSet();
-    bool isValid(Unit u) => !uniques.contains(u);
     return SimpleDialog(
       children: units.map((unit) {
         return ListTile(
@@ -318,12 +313,7 @@ class _AddUnitDialog extends StatelessWidget {
             points: unit.points,
             color: factionColor(unit.faction),
           ),
-          enabled: isValid(unit),
-          onTap: isValid(unit)
-              ? () {
-                  Navigator.pop(context, unit);
-                }
-              : null,
+          onTap: () => Navigator.pop(context, unit),
         );
       }).toList(),
       title: const Text('Add Unit'),

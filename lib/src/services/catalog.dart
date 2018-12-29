@@ -97,12 +97,18 @@ class Catalog {
         (p, u) => p + (u.addsMiniature ? 1 : 0));
   }
 
-  /// Returns [Unit]s that can be added to an army of [faction].
-  Iterable<Unit> unitsForFaction(Faction faction) {
-    return units.where((f) => f.faction == faction);
+  /// Returns [Unit]s that can be added to [army].
+  Iterable<Unit> unitsForArmy(Army army) {
+    final inArmy = army.units.map((u) => u.unit).toSet();
+    return units.where((unit) {
+      if (unit.isUnique && inArmy.contains(unit.toRef())) {
+        return false;
+      }
+      return unit.faction == army.faction;
+    });
   }
 
-  /// Returns [Upgrade] that can be added to a [slot].
+  /// Returns [Upgrade]s that can be added to a [slot].
   ///
   /// Optionally will further filter by upgrades that are valid for [unit].
   Iterable<Upgrade> upgradesForSlot(UpgradeSlot slot, {Unit unit}) {
@@ -116,7 +122,35 @@ class Catalog {
       if (!_nullOrEqual(u.restrictedToFaction, unit.faction)) {
         return false;
       }
-      return u.restrictedToUnit.isEmpty || u.restrictedToUnit.contains(unit);
+      return u.restrictedToUnit.isEmpty ||
+          u.restrictedToUnit.contains(unit.toRef());
+    });
+  }
+
+  /// Returns [Upgrade]s that can be added to a [unit].
+  ///
+  /// This skips upgrades that could be _normally_ added, but cannot currently
+  /// due to that upgrade already being added or no valid slots of that upgrade
+  /// type being available.
+  Iterable<Upgrade> upgradesForUnit(ArmyUnit unit) {
+    final details = lookupUnit(unit.unit);
+    final upgradeSlots = details.upgrades;
+    final availableSlots = upgradeSlots.toMap();
+    for (final upgrade in unit.upgrades.map(lookupUpgrade)) {
+      final value = availableSlots[upgrade.type];
+      if (value != null) {
+        availableSlots[upgrade.type] = value - 1;
+      }
+    }
+    return upgrades.where((u) {
+      if ((availableSlots[u.type] ?? 0) < 1) {
+        return false;
+      }
+      if (u.restrictedToUnit.isNotEmpty &&
+          !u.restrictedToUnit.contains(unit.unit)) {
+        return false;
+      }
+      return _nullOrEqual(u.restrictedToFaction, details.faction);
     });
   }
 }

@@ -866,7 +866,7 @@ class _AddUpgradeDialog extends StatelessWidget {
         return u.restrictedToFaction == unit.faction;
       }
       if (u.restrictedToUnit.isNotEmpty) {
-        return u.restrictedToUnit.contains(unit);
+        return u.restrictedToUnit.contains(unit.toRef());
       }
       return true;
     });

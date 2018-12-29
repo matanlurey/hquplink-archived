@@ -456,22 +456,7 @@ class _AddUpgradeDialog extends StatelessWidget {
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final details = catalog.lookupUnit(unit.unit);
-    final upgrades = details.upgrades.keys
-        .map(catalog.upgradesForSlot)
-        .expand((i) => i)
-        .toList()
-          ..sort((a, b) => a.name.compareTo(b.name));
-
-    // TODO: Refactor this nightmare.
-    // TODO: Also disable adding upgrades entirely if maxed out.
-    bool isValid(Upgrade upgrade) =>
-        unit.upgrades
-                .map(catalog.lookupUpgrade)
-                .map((u) => u.type == upgrade.type)
-                .length <
-            details.upgrades[upgrade.type] &&
-        !unit.upgrades.any((u) => u.id == upgrade.id);
+    final upgrades = catalog.upgradesForUnit(unit);
 
     return SimpleDialog(
       children: upgrades.map((upgrade) {
@@ -483,12 +468,7 @@ class _AddUpgradeDialog extends StatelessWidget {
           ),
           subtitle: Text(toTitleCase(upgrade.type.name)),
           trailing: Text('${upgrade.points}'),
-          enabled: isValid(upgrade),
-          onTap: isValid(upgrade)
-              ? () {
-                  Navigator.pop(context, upgrade);
-                }
-              : null,
+          onTap: () => Navigator.pop(context, upgrade),
         );
       }).toList(),
       title: const Text('Add Upgrade'),

@@ -25,17 +25,20 @@ abstract class Mutex<T, Y extends StatefulWidget> extends State<Y> {
   }
 
   void _promptUndo(BuildContext context, String description, T oldValue) {
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text(description),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            setValue(oldValue);
-          },
+    Scaffold.of(context)
+      // TODO: Consider a better way of doing this.
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(description),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              setValue(oldValue);
+            },
+          ),
         ),
-      ),
-    );
+      );
   }
 
   @override
