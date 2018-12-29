@@ -16,10 +16,11 @@ class ListArmiesPage extends StatefulWidget {
   /// Optional; if defined, allows [initialArmies] to be edited.
   final void Function(BuiltList<Army>) onUpdate;
 
-  const ListArmiesPage({
+  ListArmiesPage({
     @required this.initialArmies,
     this.onUpdate,
-  }) : assert(initialArmies != null);
+  })  : assert(initialArmies != null),
+        super(key: ValueKey(initialArmies));
 
   @override
   createState() => _ListArmiesState();

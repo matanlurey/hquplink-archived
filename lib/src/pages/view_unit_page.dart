@@ -53,10 +53,33 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
       ),
       body: CustomScrollView(
         slivers: [
-          FactionSliverHeader<void>(
+          FactionSliverHeader<_ViewUnitAction>(
             faction: details.faction,
             title: details.name,
-            onMenuPressed: (_) {},
+            onMenuPressed: (option) async {
+              switch (option) {
+                case _ViewUnitAction.deleteUnit:
+                  final details = getCatalog(context).lookupUnit(value.unit);
+                  if (!await showConfirmDialog(
+                    context: context,
+                    discardText: 'Delete',
+                    title: 'Delete ${details.name}?',
+                  )) {
+                    break;
+                  }
+                  widget.onUpdate(null);
+                  return Navigator.pop(context);
+              }
+            },
+            menu: const [
+              PopupMenuItem(
+                child: ListTile(
+                  leading: const Icon(Icons.delete),
+                  title: const Text('Delete Unit'),
+                ),
+                value: _ViewUnitAction.deleteUnit,
+              ),
+            ],
             bottom: _ViewUnitHeader(
               unit: value,
             ),
@@ -126,7 +149,10 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                     ),
                   ],
                 ),
-              )
+              ),
+              Container(
+                padding: const EdgeInsets.only(bottom: 80),
+              ),
             ]),
           ),
         ],
@@ -188,6 +214,10 @@ Widget _buildDefenseValue(Unit details) {
     );
   }
   return Row(children: children);
+}
+
+enum _ViewUnitAction {
+  deleteUnit,
 }
 
 class _ViewUnitHeader extends StatelessWidget {

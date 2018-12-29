@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/pages.dart';
 import 'package:hquplink/patterns.dart';
@@ -68,6 +69,9 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
                   builder: _buildList,
                 ),
               ),
+              Container(
+                padding: const EdgeInsetsDirectional.only(bottom: 80),
+              ),
             ]),
           ),
         ],
@@ -109,7 +113,13 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
                       unit: unit,
                       onUpdate: (newUnit) {
                         setValue(
-                            value.rebuild((b) => b.units[index] = newUnit));
+                          value.rebuild((b) {
+                            b.units.removeAt(index);
+                            if (newUnit != null) {
+                              b.units.insert(index, newUnit);
+                            }
+                          }),
+                        );
                       },
                     );
                   }),

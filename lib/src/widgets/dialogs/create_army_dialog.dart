@@ -148,12 +148,14 @@ class _CreateArmyDialogState extends State<CreateArmyDialog> {
                   min: 0,
                   max: 1600,
                   label: '${army.maxPoints} Points',
+                  divisions: 1600 ~/ 50,
                   value: army.maxPoints.toDouble(),
                   onChanged: (value) {
                     setState(() {
                       army.maxPoints = value.toInt();
                     });
                   },
+                  activeColor: theme.accentColor,
                 )
               ],
               crossAxisAlignment: CrossAxisAlignment.start,

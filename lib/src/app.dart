@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/pages.dart';
 import 'package:hquplink/services.dart';
@@ -85,15 +86,18 @@ class _AppShellState extends State<AppShell> {
             );
           },
         ),
-        body: ListArmiesPage(
-          initialArmies: roster.armies,
-          onUpdate: (armies) {
-            setState(() {
-              final builder = roster.toBuilder()..armies.clear();
-              builder.armies.addAll(armies);
-              roster = builder.build();
-            });
-          },
+        body: Padding(
+          padding: const EdgeInsets.only(bottom: 80),
+          child: ListArmiesPage(
+            initialArmies: roster.armies,
+            onUpdate: (armies) {
+              setState(() {
+                final builder = roster.toBuilder()..armies.clear();
+                builder.armies.addAll(armies);
+                roster = builder.build();
+              });
+            },
+          ),
         ),
       ),
     );
