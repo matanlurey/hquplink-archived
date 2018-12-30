@@ -12,6 +12,7 @@ import 'app.dart';
 void run({
   String overrideDeviceId,
   JsonStorage overrideStorage,
+  Settings overrideSettings,
 }) async {
   // Use JSON Local Storage.
   final storage = overrideStorage ??
@@ -22,14 +23,20 @@ void run({
   // Load Local Device ID for UUIDs.
   setDeviceId(overrideDeviceId ?? await DeviceId.getID);
 
+  // Use local or in-memory settings.
+  final settings = overrideSettings ?? await Settings.onDevice();
+
   // Start the application.
   runApp(
-    provideStorage(
-      storage,
-      provideCatalog(
-        Catalog.builtIn,
-        AppShell(
-          initialRoster: await _loadRosterOrRecover(storage),
+    provideSettings(
+      settings,
+      provideStorage(
+        storage,
+        provideCatalog(
+          Catalog.builtIn,
+          AppShell(
+            initialRoster: await _loadRosterOrRecover(storage),
+          ),
         ),
       ),
     ),

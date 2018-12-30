@@ -13,7 +13,9 @@ void main() async {
     Roster.serializer,
     'roster.json',
   );
+
   return run(
+    overrideSettings: Settings.inMemory(),
     overrideStorage: storage,
   );
 }
