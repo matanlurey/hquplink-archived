@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:swlegion/swlegion.dart';
 
+/// Creates an icon representing an defense dice for the provided [dice].
 class DefenseDiceIcon extends StatelessWidget {
   final DefenseDice dice;
 
-  DefenseDiceIcon(this.dice) : super(key: ValueKey(dice));
+  DefenseDiceIcon({
+    @required this.dice,
+  }) : super(key: ValueKey(dice));
 
   @override
   build(_) {

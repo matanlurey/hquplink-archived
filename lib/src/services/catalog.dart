@@ -4,17 +4,6 @@ import 'package:swlegion/database.dart' as aggregate;
 
 import 'unique_ids.dart';
 
-/// Returns [elements] indexed as a `Map: Reference<E> -> E`.
-Map<Reference<E>, E> indexEntities<E extends Indexable<E>>(
-  Iterable<E> elements,
-) {
-  final results = <Reference<E>, E>{};
-  for (final e in elements) {
-    results[e.toRef()] = e;
-  }
-  return Map.unmodifiable(results);
-}
-
 /// Data model for Star Wars: Legion.
 ///
 /// Binds to the model and data from `package:swlegion`, and provides additional

@@ -20,7 +20,7 @@ class ListArmiesPage extends StatefulWidget {
     @required this.initialArmies,
     this.onUpdate,
   })  : assert(initialArmies != null),
-        super(key: ValueKey(initialArmies));
+        super(key: ValueKey(BuiltList.of(initialArmies.map((a) => a.id))));
 
   @override
   createState() => _ListArmiesState();

@@ -5,9 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 @Immutable()
 abstract class Settings {
-  static Future<Settings> onDevice() async {
-    return _SharedPreferencesSettings(await SharedPreferences.getInstance());
-  }
+  factory Settings.onDevice(
+    SharedPreferences preferences,
+  ) = _SharedPreferencesSettings;
 
   factory Settings.inMemory([Map<String, Object> data]) {
     return _MemorySettings(data ?? {});
@@ -26,7 +26,7 @@ abstract class Settings {
   /// * [int]
   /// * [List<String>]
   /// * [String]
-  @protected
+  @visibleForTesting
   T get<T>(String key);
 
   /// Sets [key] as a [value].
@@ -37,12 +37,15 @@ abstract class Settings {
   /// * [int]
   /// * [List<String>]
   /// * [String]
-  @protected
+  @visibleForTesting
   void set<T>(String key, T value);
 
   /// Returns whether to group units by rank.
-  bool get groupByRank => get('group_by_rank') ?? true;
-  set groupByRank(bool v) => set('group_by_rank', v);
+  bool get groupByRank => get(keyGroupByRank) ?? false;
+  set groupByRank(bool v) => set(keyGroupByRank, v);
+
+  @visibleForTesting
+  static const keyGroupByRank = 'group_by_rank';
 }
 
 class _SharedPreferencesSettings extends Settings {
