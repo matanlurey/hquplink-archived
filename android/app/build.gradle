@@ -67,6 +67,12 @@ android {
     flavorDimensions "version"
 
     productFlavors {
+        local {
+            signingConfig signingConfigs.debug
+            dimension "version"
+            versionNameSuffix "-local"
+        }
+
         // flutter build apk --flavor early
         early {
             signingConfig signingConfigs.release

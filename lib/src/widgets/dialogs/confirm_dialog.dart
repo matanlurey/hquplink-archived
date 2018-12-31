@@ -12,14 +12,15 @@ Future<bool> showConfirmDialog({
   String cancelText = 'Cancel',
 }) {
   return showDialog(
-      context: context,
-      builder: (_) {
-        return _ConfirmDialog(
-          title: title,
-          discardText: discardText,
-          cancelText: cancelText,
-        );
-      });
+    context: context,
+    builder: (_) {
+      return _ConfirmDialog(
+        title: title,
+        discardText: discardText,
+        cancelText: cancelText,
+      );
+    },
+  );
 }
 
 class _ConfirmDialog extends StatelessWidget {
@@ -36,7 +37,7 @@ class _ConfirmDialog extends StatelessWidget {
   @override
   build(context) {
     return AlertDialog(
-      content: Text(discardText),
+      content: Text(title),
       actions: [
         FlatButton(
           child: Text(cancelText.toUpperCase()),

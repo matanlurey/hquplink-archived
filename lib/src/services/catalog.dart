@@ -1,51 +1,41 @@
+import 'package:hquplink/models.dart';
 import 'package:meta/meta.dart';
 import 'package:swlegion/database.dart' as aggregate;
-import 'package:swlegion/swlegion.dart';
 
 import 'unique_ids.dart';
 
-class Catalog {
-  static bool _nullOrEqual<T>(T a, T b) {
-    return a == null || a == b;
+/// Returns [elements] indexed as a `Map: Reference<E> -> E`.
+Map<Reference<E>, E> indexEntities<E extends Indexable<E>>(
+  Iterable<E> elements,
+) {
+  final results = <Reference<E>, E>{};
+  for (final e in elements) {
+    results[e.toRef()] = e;
   }
+  return Map.unmodifiable(results);
+}
 
+/// Data model for Star Wars: Legion.
+///
+/// Binds to the model and data from `package:swlegion`, and provides additional
+/// functionality for the application such as validation, filtering, and more.
+class Catalog extends Holodeck {
   /// Catalog that is built-in to this package (not downloaded).
   static final builtIn = Catalog(
-    units: aggregate.units,
-    upgrades: aggregate.upgrades,
+    commands: aggregate.allCommands,
+    units: aggregate.allUnits,
+    upgrades: aggregate.allUpgrades,
   );
 
-  final Map<UnitKey, Unit> _unitsIndexed;
-
-  static Map<UnitKey, Unit> _indexUnits(Iterable<Unit> units) {
-    final results = <UnitKey, Unit>{};
-    for (final unit in units) {
-      results[unit.toKey()] = unit;
-    }
-    return Map.unmodifiable(results);
-  }
-
-  final Map<UpgradeKey, Upgrade> _upgradesIndexed;
-
-  static Map<UpgradeKey, Upgrade> _indexUpgrades(Iterable<Upgrade> upgrades) {
-    final results = <UpgradeKey, Upgrade>{};
-    for (final upgrade in upgrades) {
-      results[upgrade.toKey()] = upgrade;
-    }
-    return Map.unmodifiable(results);
-  }
-
   Catalog({
+    @required Iterable<CommandCard> commands,
     @required Iterable<Unit> units,
     @required Iterable<Upgrade> upgrades,
-  })  : _unitsIndexed = _indexUnits(units),
-        _upgradesIndexed = _indexUpgrades(upgrades);
-
-  /// Units in the database.
-  Iterable<Unit> get units => _unitsIndexed.values;
-
-  /// Upgrades in the database.
-  Iterable<Upgrade> get upgrades => _upgradesIndexed.values;
+  }) : super(
+          commands: commands,
+          units: units,
+          upgrades: upgrades,
+        );
 
   /// Returns a new empty [ArmyBuilder].
   ///
@@ -66,44 +56,31 @@ class Catalog {
     return ArmyUnitBuilder()..id = generateLocalId();
   }
 
-  /// Returns the [Unit] for the cooresponding [key].
-  Unit lookupUnit(UnitKey key) => _unitsIndexed[key];
-
-  /// Returns the [Upgrade] for the cooresponding [key].
-  Upgrade lookupUpgrade(UpgradeKey key) => _upgradesIndexed[key];
-
   /// Returns the sum of all points in the provided [army].
-  int sumArmyPoints(Army army) {
-    return army.units.fold(0, (p, u) => p + sumUnitPoints(u));
+  int costOfArmy(Army army) {
+    return army.units.fold(
+      0,
+      (p, u) => p + costOfUnit(u.unit, upgrades: u.upgrades),
+    );
   }
 
-  /// Returns the sum of all points in the provided [armyUnit].
-  int sumUnitPoints(ArmyUnit armyUnit) {
-    final unit = lookupUnit(armyUnit.unit);
-    final upgrades = armyUnit.upgrades.map(lookupUpgrade);
-    return upgrades.fold(unit.points, (p, u) => p + u.points);
+  /// Returns the sum of all miniatures in the provided [armyUnit].
+  int sumMiniatures(ArmyUnit armyUnit) {
+    final upgrades = armyUnit.upgrades.map(toUpgrade);
+    return upgrades.fold(
+      toUnit(armyUnit.unit).miniatures,
+      (p, u) => p + (u.addsMiniature ? 1 : 0),
+    );
   }
 
-  /// Returns [Unit]s that can be added to an army of [faction].
-  Iterable<Unit> unitsForFaction(Faction faction) {
-    return units.where((f) => f.faction == faction);
-  }
-
-  /// Returns [Upgrade] that can be added to a [slot].
-  ///
-  /// Optionally will further filter by upgrades that are valid for [unit].
-  Iterable<Upgrade> upgradesForSlot(UpgradeSlot slot, {Unit unit}) {
-    return upgrades.where((u) {
-      if (u.type != slot) {
+  /// Returns [Unit]s that can be added to [army].
+  Iterable<Unit> unitsForArmy(Army army) {
+    final inArmy = army.units.map((u) => u.unit).toSet();
+    return units.where((unit) {
+      if (unit.isUnique && inArmy.contains(unit.toRef())) {
         return false;
       }
-      if (unit == null) {
-        return true;
-      }
-      if (!_nullOrEqual(u.restrictedToFaction, unit.faction)) {
-        return false;
-      }
-      return u.restrictedToUnit.isEmpty || u.restrictedToUnit.contains(unit);
+      return unit.faction == army.faction;
     });
   }
 }

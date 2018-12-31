@@ -31,7 +31,10 @@ dev_dependencies:
 flutter:
   assets:
     - assets/
+    - assets/dice/attack/
+    - assets/dice/defense/
     - assets/cards/
     - assets/factions/
+    - assets/ranks/
     - assets/upgrades/
   uses-material-design: true
