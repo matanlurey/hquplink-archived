@@ -186,7 +186,7 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
     }
     final isCrit = details.attackSurge == AttackSurge.critical;
     return AttackSideIcon(
-      isCrit ? AttackDiceSide.criticalHit : AttackDiceSide.hit,
+      side: isCrit ? AttackDiceSide.criticalHit : AttackDiceSide.hit,
       height: 12,
       color: Colors.white,
     );
@@ -198,7 +198,7 @@ Widget _buildDefenseValue(Unit details) {
     SizedBox(
       width: 12,
       height: 12,
-      child: DefenseDiceIcon(details.defense),
+      child: DefenseDiceIcon(dice: details.defense),
     ),
   ];
   if (details.hasDefenseSurge) {
@@ -206,7 +206,7 @@ Widget _buildDefenseValue(Unit details) {
       const Padding(
         padding: const EdgeInsets.only(left: 8),
         child: const DefenseSideIcon(
-          DefenseDiceSide.surge,
+          side: DefenseDiceSide.surge,
           height: 16,
           color: Colors.white,
         ),
@@ -452,7 +452,7 @@ class _ViewUnitWeapons extends StatelessWidget {
         child: SizedBox(
           width: 10,
           height: 10,
-          child: AttackDiceIcon(d),
+          child: AttackDiceIcon(dice: d),
         ),
       );
     }).toList();
