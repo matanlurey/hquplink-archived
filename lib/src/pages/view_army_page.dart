@@ -169,7 +169,7 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
 
   void _deleteUnit(BuildContext context, ArmyUnit unit) {
     final catalog = getCatalog(context);
-    final details = catalog.lookupUnit(unit.unit);
+    final details = catalog.toUnit(unit.unit);
     setValue(
       value.rebuild((b) => b.units.remove(unit)),
       notifyRevert: context,
@@ -249,13 +249,13 @@ class _PreviewUnitTile extends StatelessWidget {
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final details = catalog.lookupUnit(unit.unit);
+    final details = catalog.toUnit(unit.unit);
     return ListTile(
       title: Text(details.name),
       subtitle: details.subTitle != null ? Text(details.subTitle) : null,
       leading: UnitAvatar(details),
       trailing: _SumPointsBox(
-        points: catalog.sumUnitPoints(unit),
+        points: catalog.costOfUnit(unit.unit),
         color: factionColor(details.faction),
       ),
       onTap: onPressed,

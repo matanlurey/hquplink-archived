@@ -7,10 +7,10 @@ import 'package:meta/meta.dart';
 class WeaponView {
   static Iterable<WeaponView> all(Catalog catalog, ArmyUnit unit) sync* {
     // Built-in weapons.
-    final details = catalog.lookupUnit(unit.unit);
+    final details = catalog.toUnit(unit.unit);
     yield* details.weapons.map((w) => WeaponView.fromBuiltIn(catalog, unit, w));
 
-    final upgrades = unit.upgrades.map(catalog.lookupUpgrade);
+    final upgrades = unit.upgrades.map(catalog.toUpgrade);
     yield* upgrades.where((u) => u.weapon != null).map((u) {
       return WeaponView.fromUpgrade(catalog, unit, u);
     });
@@ -51,8 +51,8 @@ class WeaponView {
     ArmyUnit unit,
     Weapon weapon,
   ) {
-    final details = catalog.lookupUnit(unit.unit);
-    final upgrades = unit.upgrades.map(catalog.lookupUpgrade);
+    final details = catalog.toUnit(unit.unit);
+    final upgrades = unit.upgrades.map(catalog.toUpgrade);
     final added = upgrades.where((u) => u.addsMiniature);
 
     var totalMinisWithWeapon = details.miniatures + added.length;
@@ -84,8 +84,8 @@ class WeaponView {
     ArmyUnit unit,
     Upgrade upgrade,
   ) {
-    final details = catalog.lookupUnit(unit.unit);
-    final upgrades = unit.upgrades.map(catalog.lookupUpgrade);
+    final details = catalog.toUnit(unit.unit);
+    final upgrades = unit.upgrades.map(catalog.toUpgrade);
     final added = upgrades.where((u) => u.addsMiniature);
     final weapon = upgrade.weapon;
     assert(weapon != null);

@@ -31,7 +31,7 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final details = catalog.lookupUnit(value.unit);
+    final details = catalog.toUnit(value.unit);
     final isVehicle = const [
       UnitType.groundVehicle,
       UnitType.repulsorVehicle,
@@ -59,7 +59,7 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
             onMenuPressed: (option) async {
               switch (option) {
                 case _ViewUnitAction.deleteUnit:
-                  final details = getCatalog(context).lookupUnit(value.unit);
+                  final details = getCatalog(context).toUnit(value.unit);
                   if (!await showConfirmDialog(
                     context: context,
                     discardText: 'Delete',
@@ -228,8 +228,8 @@ class _ViewUnitHeader extends StatelessWidget {
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final details = catalog.lookupUnit(unit.unit);
-    final sumPoints = catalog.sumUnitPoints(unit);
+    final details = catalog.toUnit(unit.unit);
+    final sumPoints = catalog.costOfUnit(unit.unit);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
@@ -342,7 +342,7 @@ class _ViewUnitKeywords extends StatelessWidget {
 
   @override
   build(context) {
-    final keywords = getCatalog(context).lookupUnit(unit.unit).keywords;
+    final keywords = getCatalog(context).toUnit(unit.unit).keywords;
     return ListView(
       padding: const EdgeInsets.all(0),
       primary: false,
@@ -377,7 +377,7 @@ class _ViewUnitUpgrades extends StatelessWidget {
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final upgrades = unit.upgrades.map(catalog.lookupUpgrade);
+    final upgrades = unit.upgrades.map(catalog.toUpgrade);
     return ListView(
       primary: false,
       shrinkWrap: true,
@@ -486,7 +486,7 @@ class _AddUpgradeDialog extends StatelessWidget {
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final upgrades = catalog.upgradesForUnit(unit);
+    final upgrades = catalog.upgradesForUnit(unit.unit);
 
     return SimpleDialog(
       children: upgrades.map((upgrade) {

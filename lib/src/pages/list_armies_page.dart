@@ -119,7 +119,7 @@ class _ArmyListTile extends StatelessWidget {
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final units = army.units.map((u) => catalog.lookupUnit(u.unit));
+    final units = army.units.map((u) => catalog.toUnit(u.unit));
     final sorted = units.toList()..sort((a, b) => a.points.compareTo(b.points));
     final leaders = sorted.reversed.take(3).toList();
     final sumPoints = catalog.sumArmyPoints(army);
