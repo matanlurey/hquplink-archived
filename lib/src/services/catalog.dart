@@ -57,8 +57,11 @@ class Catalog extends Holodeck {
   }
 
   /// Returns the sum of all points in the provided [army].
-  int sumArmyPoints(Army army) {
-    return army.units.fold(0, (p, u) => p + costOfUnit(u.unit));
+  int costOfArmy(Army army) {
+    return army.units.fold(
+      0,
+      (p, u) => p + costOfUnit(u.unit, upgrades: u.upgrades),
+    );
   }
 
   /// Returns the sum of all miniatures in the provided [armyUnit].

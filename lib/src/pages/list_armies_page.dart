@@ -122,7 +122,7 @@ class _ArmyListTile extends StatelessWidget {
     final units = army.units.map((u) => catalog.toUnit(u.unit));
     final sorted = units.toList()..sort((a, b) => a.points.compareTo(b.points));
     final leaders = sorted.reversed.take(3).toList();
-    final sumPoints = catalog.sumArmyPoints(army);
+    final sumPoints = catalog.costOfArmy(army);
     final maxPoints = '${army.maxPoints ?? '∞'} Points';
     Widget tile = ListTile(
       title: Text(army.name),

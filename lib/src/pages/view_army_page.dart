@@ -203,7 +203,7 @@ class _ViewArmyHeader extends StatelessWidget {
   build(context) {
     final catalog = getCatalog(context);
     final theme = Theme.of(context);
-    final sumPoints = catalog.sumArmyPoints(army);
+    final sumPoints = catalog.costOfArmy(army);
     final withinMax = army.maxPoints == null || sumPoints <= army.maxPoints;
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -215,7 +215,7 @@ class _ViewArmyHeader extends StatelessWidget {
           Text('${army.units.length} Activations'),
           Row(
             children: [
-              Text('${catalog.sumArmyPoints(army)}'),
+              Text('${catalog.costOfArmy(army)}'),
               Text(
                 ' / ${army.maxPoints ?? '∞'}',
                 style: withinMax ? null : TextStyle(color: theme.errorColor),
@@ -255,7 +255,7 @@ class _PreviewUnitTile extends StatelessWidget {
       subtitle: details.subTitle != null ? Text(details.subTitle) : null,
       leading: UnitAvatar(details),
       trailing: _SumPointsBox(
-        points: catalog.costOfUnit(unit.unit),
+        points: catalog.costOfUnit(unit.unit, upgrades: unit.upgrades),
         color: factionColor(details.faction),
       ),
       onTap: onPressed,

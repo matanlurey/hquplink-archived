@@ -229,7 +229,7 @@ class _ViewUnitHeader extends StatelessWidget {
   build(context) {
     final catalog = getCatalog(context);
     final details = catalog.toUnit(unit.unit);
-    final sumPoints = catalog.costOfUnit(unit.unit);
+    final sumPoints = catalog.costOfUnit(unit.unit, upgrades: unit.upgrades);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
