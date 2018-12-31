@@ -16,9 +16,12 @@ abstract class Mutex<T, Y extends StatefulWidget> extends State<Y> {
     BuildContext notifyRevert,
   }) {
     final oldValue = value;
-    setState(() => _value = newValue);
+    if (mounted) {
+      setState(() => _value = newValue);
+    }
     onUpdate();
     if (notifyRevert != null) {
+      assert(mounted);
       assert(describeRevert != null);
       _promptUndo(notifyRevert, describeRevert(newValue), oldValue);
     }
