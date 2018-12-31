@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 
@@ -24,7 +25,10 @@ void run({
   setDeviceId(overrideDeviceId ?? await DeviceId.getID);
 
   // Use local or in-memory settings.
-  final settings = overrideSettings ?? await Settings.onDevice();
+  final settings = overrideSettings ??
+      Settings.onDevice(
+        await SharedPreferences.getInstance(),
+      );
 
   // Start the application.
   runApp(

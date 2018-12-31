@@ -6,10 +6,12 @@ import 'package:built_collection/built_collection.dart';
 import 'package:built_value/standard_json_plugin.dart';
 import 'package:built_value/serializer.dart';
 import 'package:hquplink/models.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
-/// JSON [Serializers] for this Object Model.
-final Serializers _jsonSerializer = () {
+/// JSON [Serializers] for this
+@visibleForTesting
+final Serializers jsonSerializer = () {
   final builder = rosterSerializers.toBuilder()
     ..add(Roster.serializer)
     ..addBuilderFactory(
@@ -67,9 +69,9 @@ class _MemoryJsonStorage extends JsonStorage {
   }) async {
     final json = _backingMap[path];
     if (json == null) {
-      return defaultTo();
+      return super.loadJson(serializer, path, defaultTo: defaultTo);
     }
-    return _jsonSerializer.deserializeWith(serializer, json);
+    return jsonSerializer.deserializeWith(serializer, json);
   }
 
   @override
@@ -78,7 +80,7 @@ class _MemoryJsonStorage extends JsonStorage {
     Serializer<T> serializer,
     String path,
   ) async {
-    _backingMap[path] = _jsonSerializer.serializeWith(serializer, entity);
+    _backingMap[path] = jsonSerializer.serializeWith(serializer, entity);
   }
 
   @override
@@ -105,11 +107,15 @@ class _DiskJsonStorage extends JsonStorage {
   }) async {
     final file = File(p.join(this.path, path));
     if (!await file.exists()) {
-      return defaultTo();
+      return super.loadJson(
+        serializer,
+        path,
+        defaultTo: defaultTo,
+      );
     }
     final data = await file.readAsString();
     final json = jsonDecode(data) as Object;
-    return _jsonSerializer.deserializeWith(serializer, json);
+    return jsonSerializer.deserializeWith(serializer, json);
   }
 
   @override
@@ -119,7 +125,7 @@ class _DiskJsonStorage extends JsonStorage {
     String path,
   ) async {
     final file = File(p.join(this.path, path));
-    final data = _jsonSerializer.serializeWith(serializer, entity);
+    final data = jsonSerializer.serializeWith(serializer, entity);
     final json = jsonEncode(data);
     return file.writeAsString(json);
   }
