@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/widgets.dart';
 
-import '../common.dart';
+import '../../common.dart';
 
 // TODO: Figure out why images are still not rendering in this test.
 void main() {
