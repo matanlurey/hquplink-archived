@@ -51,6 +51,13 @@ void run({
           AppShell(
             appVersion: appVersion,
             initialRoster: await _loadRosterOrRecover(storage),
+            onRosterUpdated: (roster) async {
+              await storage.saveJson(
+                roster,
+                Roster.serializer,
+                'roster.json',
+              );
+            },
           ),
         ),
       ),

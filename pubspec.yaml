@@ -1,6 +1,6 @@
 name: hquplink
 description: 'A free app and resource for the Star Wars: Legion community'
-version: 0.1.0+1
+version: 0.1.0+7
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
