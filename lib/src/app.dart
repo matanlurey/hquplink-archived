@@ -14,11 +14,14 @@ class AppShell extends StatefulWidget {
     );
   }
 
+  final String appVersion;
   final Roster initialRoster;
 
   const AppShell({
+    @required this.appVersion,
     @required this.initialRoster,
-  }) : assert(initialRoster != null);
+  })  : assert(appVersion != null),
+        assert(initialRoster != null);
 
   @override
   createState() {
@@ -85,6 +88,23 @@ class _AppShellState extends State<AppShell> {
               onPressed: () => addNewArmy(context),
             );
           },
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              DrawerHeader(
+                child: Wrap(),
+                decoration: BoxDecoration(
+                  color: theme.primaryColor,
+                ),
+              ),
+              AboutListTile(
+                icon: const Icon(Icons.info),
+                applicationIcon: const Icon(Icons.info, color: Colors.white),
+                applicationVersion: widget.appVersion,
+              ),
+            ],
+          ),
         ),
         body: Padding(
           padding: const EdgeInsets.only(bottom: 80),

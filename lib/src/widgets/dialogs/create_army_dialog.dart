@@ -116,16 +116,6 @@ class _CreateArmyDialogState extends State<CreateArmyDialog> {
                 ),
                 RadioListTile<int>(
                   groupValue: army.maxPoints,
-                  value: 0,
-                  title: const Text('Unlimited (∞)'),
-                  onChanged: (value) {
-                    setState(() {
-                      army.maxPoints = value;
-                    });
-                  },
-                ),
-                RadioListTile<int>(
-                  groupValue: army.maxPoints,
                   value: 800,
                   title: const Text('Standard (800)'),
                   onChanged: (value) {
@@ -144,19 +134,31 @@ class _CreateArmyDialogState extends State<CreateArmyDialog> {
                     });
                   },
                 ),
-                Slider(
-                  min: 0,
-                  max: 1600,
-                  label: '${army.maxPoints} Points',
-                  divisions: 1600 ~/ 50,
-                  value: army.maxPoints.toDouble(),
+                RadioListTile<int>(
+                  groupValue: army.maxPoints,
+                  value: 0,
+                  title: const Text('Unlimited (∞)'),
                   onChanged: (value) {
                     setState(() {
-                      army.maxPoints = value.toInt();
+                      army.maxPoints = value;
                     });
                   },
-                  activeColor: theme.accentColor,
-                )
+                ),
+                army.maxPoints == 0
+                    ? Container()
+                    : Slider(
+                        min: 0,
+                        max: 1600,
+                        label: '${army.maxPoints} Points',
+                        divisions: 1600 ~/ 50,
+                        value: army.maxPoints.toDouble(),
+                        onChanged: (value) {
+                          setState(() {
+                            army.maxPoints = value.toInt();
+                          });
+                        },
+                        activeColor: theme.accentColor,
+                      )
               ],
               crossAxisAlignment: CrossAxisAlignment.start,
             ),
