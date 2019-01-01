@@ -16,10 +16,12 @@ class AppShell extends StatefulWidget {
 
   final String appVersion;
   final Roster initialRoster;
+  final void Function(Roster) onRosterUpdated;
 
   const AppShell({
     @required this.appVersion,
     @required this.initialRoster,
+    @required this.onRosterUpdated,
   })  : assert(appVersion != null),
         assert(initialRoster != null);
 
@@ -48,6 +50,7 @@ class _AppShellState extends State<AppShell> {
   void updateRoster(void Function(RosterBuilder) update) {
     setState(() {
       roster = roster.rebuild(update);
+      widget.onRosterUpdated(roster);
     });
   }
 
@@ -65,9 +68,7 @@ class _AppShellState extends State<AppShell> {
       ),
     );
     if (army != null) {
-      setState(() {
-        roster = (roster.toBuilder()..armies.add(army)).build();
-      });
+      updateRoster((b) => b.armies.add(army));
     }
   }
 
@@ -111,11 +112,7 @@ class _AppShellState extends State<AppShell> {
           child: ListArmiesPage(
             initialArmies: roster.armies,
             onUpdate: (armies) {
-              setState(() {
-                final builder = roster.toBuilder()..armies.clear();
-                builder.armies.addAll(armies);
-                roster = builder.build();
-              });
+              updateRoster((b) => b.armies = armies.toBuilder());
             },
           ),
         ),

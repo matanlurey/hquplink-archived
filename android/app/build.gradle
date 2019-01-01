@@ -13,12 +13,12 @@ if (flutterRoot == null) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
+    throw new GradleException("Missing flutter.versionCode.")
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
+    throw new GradleException("Missing flutter.versionName.")
 }
 
 apply plugin: 'com.android.application'
@@ -57,27 +57,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            versionNameSuffix "-debug"
+            signingConfig signingConfigs.debug
+        }
+
         release {
-            // Signs with the debug keys, so it is possible to run and build from source.
-            // i.e. either `flutter run --release`, or `flutter build apk && fluter install`.
-            signingConfig signingConfigs.debug
-        }
-    }
-
-    flavorDimensions "version"
-
-    productFlavors {
-        local {
-            signingConfig signingConfigs.debug
-            dimension "version"
-            versionNameSuffix "-local"
-        }
-
-        // flutter build apk --flavor early
-        early {
             signingConfig signingConfigs.release
-            dimension "version"
-            versionNameSuffix "-earlyAccess"
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
