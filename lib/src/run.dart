@@ -2,6 +2,7 @@ import 'package:device_id/device_id.dart';
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/services.dart';
+import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,6 +13,7 @@ import 'app.dart';
 /// May optionally provide different settings for executing.
 void run({
   String overrideDeviceId,
+  PackageInfo overridePackageInfo,
   JsonStorage overrideStorage,
   Settings overrideSettings,
 }) async {
@@ -24,6 +26,9 @@ void run({
   // Load Local Device ID for UUIDs.
   setDeviceId(overrideDeviceId ?? await DeviceId.getID);
 
+  // Load package information.
+  final packageInfo = overridePackageInfo ?? await PackageInfo.fromPlatform();
+
   // Use local or in-memory settings.
   final settings = overrideSettings ??
       Settings.onDevice(
@@ -31,6 +36,11 @@ void run({
       );
 
   // Start the application.
+  var appVersion = packageInfo.version;
+  if (packageInfo.buildNumber.isNotEmpty) {
+    appVersion = '$appVersion (Build ${packageInfo.buildNumber})';
+  }
+
   runApp(
     provideSettings(
       settings,
@@ -39,6 +49,7 @@ void run({
         provideCatalog(
           Catalog.builtIn,
           AppShell(
+            appVersion: appVersion,
             initialRoster: await _loadRosterOrRecover(storage),
           ),
         ),
