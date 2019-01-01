@@ -1,5 +1,6 @@
 import 'package:hquplink/models.dart';
 import 'package:hquplink/services.dart';
+import 'package:package_info/package_info.dart';
 
 import 'src/fakes/fake_roster.dart';
 import 'src/run.dart';
@@ -17,7 +18,14 @@ void main() async {
   );
 
   return run(
-    overrideSettings: Settings.inMemory(),
-    overrideStorage: storage,
+    deviceId: 'F4K3-D3V1C3',
+    packageInfo: PackageInfo(
+      appName: 'HQ Uplink (Fake)',
+      packageName: 'hquplink_fake',
+      version: '1.0.0-fake',
+      buildNumber: '0',
+    ),
+    settings: Settings.inMemory(),
+    storage: storage,
   );
 }
