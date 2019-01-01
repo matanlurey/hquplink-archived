@@ -1,29 +1,6 @@
 // ignore_for_file: implementation_imports
 import 'package:hquplink/models.dart';
-
-import 'package:swlegion/src/database/units/at_st.dart';
-import 'package:swlegion/src/database/units/at_rt.dart';
-import 'package:swlegion/src/database/units/leia_organa.dart';
-import 'package:swlegion/src/database/units/darth_vader.dart';
-import 'package:swlegion/src/database/units/fleet_troopers.dart';
-import 'package:swlegion/src/database/units/rebel_commandos_strike_team.dart';
-import 'package:swlegion/src/database/units/stormtroopers.dart';
-import 'package:swlegion/src/database/upgrades/force/force_push.dart';
-import 'package:swlegion/src/database/upgrades/force/force_reflexes.dart';
-import 'package:swlegion/src/database/upgrades/force/saber_throw.dart';
-import 'package:swlegion/src/database/upgrades/gear/environmental_gear.dart';
-import 'package:swlegion/src/database/upgrades/grenades/impact_grenades.dart';
-import 'package:swlegion/src/database/upgrades/command/esteemed_leader.dart';
-import 'package:swlegion/src/database/upgrades/comms/hq_uplink.dart';
-import 'package:swlegion/src/database/upgrades/hardpoint/88_twin_light_blaster_cannon.dart';
-import 'package:swlegion/src/database/upgrades/hardpoint/at_rt_laser_cannon.dart';
-import 'package:swlegion/src/database/upgrades/hardpoint/at_st_mortar_launcher.dart';
-import 'package:swlegion/src/database/upgrades/hardpoint/dw3_concussion_grenade_launcher.dart';
-import 'package:swlegion/src/database/upgrades/heavy_weapon/dh_447_sniper.dart';
-import 'package:swlegion/src/database/upgrades/heavy_weapon/dlt_19_stormtrooper.dart';
-import 'package:swlegion/src/database/upgrades/heavy_weapon/scatter_gun_trooper.dart';
-import 'package:swlegion/src/database/upgrades/personnel/fleet_trooper.dart';
-import 'package:swlegion/src/database/upgrades/pilot/general_weiss.dart';
+import 'package:swlegion/database.dart';
 
 final fakeRoster = Roster(
   (b) => b
@@ -36,53 +13,53 @@ final fakeRoster = Roster(
         ..units.addAll([
           ArmyUnit((b) => b
             ..id = 'local:fake-army:darth-vader'
-            ..unit = darthVader.toRef()
+            ..unit = Units.darthVader
             ..upgrades.addAll([
-              forcePush.toRef(),
-              forceReflexes.toRef(),
-              saberThrow.toRef(),
+              Upgrades.forcePush,
+              Upgrades.forceReflexes,
+              Upgrades.saberThrow,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:at-st'
-            ..unit = atSt.toRef()
+            ..unit = Units.atSt
             ..upgrades.addAll([
-              generalWeiss.toRef(),
-              atStMortarLauncher.toRef(),
-              $88TwinLightBlasterCannon.toRef(),
-              dw3ConcussionGrenadeLauncher.toRef(),
-              hqUplink.toRef(),
+              Upgrades.generalWeiss,
+              Upgrades.atStMortarLauncher,
+              Upgrades.$88TwinLightBlasterCannon,
+              Upgrades.dw3ConcussionGrenadeLauncher,
+              Upgrades.hqUplink,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:stormtroopers-1'
-            ..unit = stormtroopers.toRef()
+            ..unit = Units.stormtroopers
             ..upgrades.addAll([
-              dlt19Stormtrooper.toRef(),
-              impactGrenades.toRef(),
-              environmentalGear.toRef(),
+              Upgrades.dlt19Stormtrooper,
+              Upgrades.impactGrenades,
+              Upgrades.environmentalGear,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:stormtroopers-2'
-            ..unit = stormtroopers.toRef()
+            ..unit = Units.stormtroopers
             ..upgrades.addAll([
-              dlt19Stormtrooper.toRef(),
-              impactGrenades.toRef(),
-              environmentalGear.toRef(),
+              Upgrades.dlt19Stormtrooper,
+              Upgrades.impactGrenades,
+              Upgrades.environmentalGear,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:stormtroopers-3'
-            ..unit = stormtroopers.toRef()
+            ..unit = Units.stormtroopers
             ..upgrades.addAll([
-              dlt19Stormtrooper.toRef(),
-              impactGrenades.toRef(),
-              environmentalGear.toRef(),
+              Upgrades.dlt19Stormtrooper,
+              Upgrades.impactGrenades,
+              Upgrades.environmentalGear,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:stormtroopers-4'
-            ..unit = stormtroopers.toRef()
+            ..unit = Units.stormtroopers
             ..upgrades.addAll([
-              dlt19Stormtrooper.toRef(),
-              impactGrenades.toRef(),
-              environmentalGear.toRef(),
+              Upgrades.dlt19Stormtrooper,
+              Upgrades.impactGrenades,
+              Upgrades.environmentalGear,
             ])),
         ])),
       Army((b) => b
@@ -93,73 +70,73 @@ final fakeRoster = Roster(
         ..units.addAll([
           ArmyUnit((b) => b
             ..id = 'local:fake-army:leia-organa'
-            ..unit = leiaOrgana.toRef()
+            ..unit = Units.leiaOrgana
             ..upgrades.addAll([
-              estmeedLeader.toRef(),
+              Upgrades.estmeedLeader,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:at-rt-1'
-            ..unit = atRt.toRef()
+            ..unit = Units.atRt
             ..upgrades.addAll([
-              atRtLaserCannon.toRef(),
-              hqUplink.toRef(),
+              Upgrades.atRtLaserCannon,
+              Upgrades.hqUplink,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:at-rt-2'
-            ..unit = atRt.toRef()
+            ..unit = Units.atRt
             ..upgrades.addAll([
-              atRtLaserCannon.toRef(),
-              hqUplink.toRef(),
+              Upgrades.atRtLaserCannon,
+              Upgrades.hqUplink,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:at-rt-3'
-            ..unit = atRt.toRef()
+            ..unit = Units.atRt
             ..upgrades.addAll([
-              atRtLaserCannon.toRef(),
-              hqUplink.toRef(),
+              Upgrades.atRtLaserCannon,
+              Upgrades.hqUplink,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:fleets-1'
-            ..unit = fleetTroopers.toRef()
+            ..unit = Units.fleetTroopers
             ..upgrades.addAll([
-              scatterGunTrooper.toRef(),
-              fleetTrooper.toRef(),
-              impactGrenades.toRef(),
-              environmentalGear.toRef(),
+              Upgrades.scatterGunTrooper,
+              Upgrades.fleetTrooper,
+              Upgrades.impactGrenades,
+              Upgrades.environmentalGear,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:fleets-2'
-            ..unit = fleetTroopers.toRef()
+            ..unit = Units.fleetTroopers
             ..upgrades.addAll([
-              scatterGunTrooper.toRef(),
-              fleetTrooper.toRef(),
-              impactGrenades.toRef(),
-              environmentalGear.toRef(),
+              Upgrades.scatterGunTrooper,
+              Upgrades.fleetTrooper,
+              Upgrades.impactGrenades,
+              Upgrades.environmentalGear,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:fleets-3'
-            ..unit = fleetTroopers.toRef()
+            ..unit = Units.fleetTroopers
             ..upgrades.addAll([
-              scatterGunTrooper.toRef(),
-              fleetTrooper.toRef(),
-              impactGrenades.toRef(),
-              environmentalGear.toRef(),
+              Upgrades.scatterGunTrooper,
+              Upgrades.fleetTrooper,
+              Upgrades.impactGrenades,
+              Upgrades.environmentalGear,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:fleets-4'
-            ..unit = fleetTroopers.toRef()
+            ..unit = Units.fleetTroopers
             ..upgrades.addAll([
-              scatterGunTrooper.toRef(),
-              fleetTrooper.toRef(),
-              impactGrenades.toRef(),
-              environmentalGear.toRef(),
+              Upgrades.scatterGunTrooper,
+              Upgrades.fleetTrooper,
+              Upgrades.impactGrenades,
+              Upgrades.environmentalGear,
             ])),
           ArmyUnit((b) => b
             ..id = 'local:fake-army:commandos'
-            ..unit = rebelCommandosStrikeTeam.toRef()
+            ..unit = Units.rebelCommandosStrikeTeam
             ..upgrades.addAll([
-              dh447Sniper.toRef(),
-              hqUplink.toRef(),
+              Upgrades.dh447Sniper,
+              Upgrades.hqUplink,
             ])),
         ]))
     ]),
