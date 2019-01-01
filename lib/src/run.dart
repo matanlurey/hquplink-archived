@@ -1,3 +1,5 @@
+// ignore_for_file: parameter_assignments
+
 import 'package:device_id/device_id.dart';
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
@@ -8,36 +10,56 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 
+Future<T> _resolve<T>(T resultOrNull, Future<T> Function() getResult) {
+  if (resultOrNull != null) {
+    return Future.value(resultOrNull);
+  }
+  return getResult();
+}
+
 /// Starts the application.
 ///
 /// May optionally provide different settings for executing.
 void run({
-  String overrideDeviceId,
-  PackageInfo overridePackageInfo,
-  JsonStorage overrideStorage,
-  Settings overrideSettings,
+  bool debugMode,
+  String deviceId,
+  PackageInfo packageInfo,
+  JsonStorage storage,
+  Settings settings,
 }) async {
-  // Use JSON Local Storage.
-  final storage = overrideStorage ??
-      JsonStorage.toDisk(
+  // If debugMode not overriden, determine based on whether asserts are enabled.
+  if (debugMode == null) {
+    debugMode = false;
+    assert(debugMode = true);
+  }
+
+  // Resolve missing service classes in parallel as much as possible.
+  await Future.wait(<Future<Object>>[
+    _resolve(deviceId, () => DeviceId.getID),
+    _resolve(packageInfo, PackageInfo.fromPlatform),
+    _resolve(storage, () async {
+      return JsonStorage.toDisk(
         (await getApplicationDocumentsDirectory()).path,
       );
-
-  // Load Local Device ID for UUIDs.
-  setDeviceId(overrideDeviceId ?? await DeviceId.getID);
-
-  // Load package information.
-  final packageInfo = overridePackageInfo ?? await PackageInfo.fromPlatform();
-
-  // Use local or in-memory settings.
-  final settings = overrideSettings ??
-      Settings.onDevice(
+    }),
+    _resolve(settings, () async {
+      return Settings.onDevice(
         await SharedPreferences.getInstance(),
       );
+    }),
+  ], eagerError: true)
+      .then((results) {
+    setDeviceId(results[0] as String);
+    packageInfo = results[1] as PackageInfo;
+    storage = results[2] as JsonStorage;
+    settings = results[3] as Settings;
+  });
 
   // Start the application.
   var appVersion = packageInfo.version;
-  if (packageInfo.buildNumber.isNotEmpty) {
+  if (debugMode) {
+    appVersion = 'DEBUG: $appVersion';
+  } else if (packageInfo.buildNumber.isNotEmpty) {
     appVersion = '$appVersion (Build ${packageInfo.buildNumber})';
   }
 
