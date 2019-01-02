@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
+import 'package:hquplink/pages.dart';
 import 'package:hquplink/patterns.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
@@ -36,9 +37,13 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
       UnitType.groundVehicle,
       UnitType.repulsorVehicle,
     ].contains(details.type);
+    final canAddUpgrade = _eligibleUpgradesFor(catalog, value).isNotEmpty;
     return Scaffold(
       floatingActionButton: Builder(
         builder: (context) {
+          if (!canAddUpgrade) {
+            return Container();
+          }
           return FloatingActionButton(
             child: const Icon(Icons.add),
             backgroundColor: Color.lerp(
@@ -91,7 +96,7 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                 child: Column(
                   children: [
                     Card(
-                      child: _ViewUnitCard(
+                      child: ViewDataCard(
                         title: const Text('Details'),
                         subtitle: Row(
                           children: [
@@ -102,7 +107,7 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                           ],
                         ),
                         trailing: UnitAvatar(details),
-                        body: _SimpleGrid(
+                        body: SimpleDataGrid(
                           data: {
                             'Points': Text('${details.points}'),
                             'Miniatures': Text('${details.miniatures}'),
@@ -119,13 +124,13 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                       ),
                     ),
                     Card(
-                      child: _ViewUnitCard(
+                      child: ViewDataCard(
                         title: const Text('Keywords'),
                         body: _ViewUnitKeywords(unit: value),
                       ),
                     ),
                     Card(
-                      child: _ViewUnitCard(
+                      child: ViewDataCard(
                         title: const Text('Upgrades'),
                         body: Builder(
                           builder: (context) {
@@ -140,7 +145,7 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                       ),
                     ),
                     Card(
-                      child: _ViewUnitCard(
+                      child: ViewDataCard(
                         title: const Text('Weapons'),
                         body: _ViewUnitWeapons(
                           unit: value,
@@ -150,9 +155,11 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.only(bottom: 80),
-              ),
+              canAddUpgrade
+                  ? Container(
+                      padding: const EdgeInsets.only(bottom: 80),
+                    )
+                  : Container(),
             ]),
           ),
         ],
@@ -163,7 +170,11 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
   void _addUpgrade(BuildContext context) async {
     final upgrade = await showDialog<Upgrade>(
       context: context,
-      builder: (_) => _AddUpgradeDialog(unit: value),
+      builder: (context) {
+        return _AddUpgradeDialog(
+          upgrades: _eligibleUpgradesFor(getCatalog(context), value),
+        );
+      },
     );
     if (upgrade != null) {
       setValue(
@@ -258,81 +269,6 @@ class _ViewUnitHeader extends StatelessWidget {
   }
 }
 
-class _ViewUnitCard extends StatelessWidget {
-  final Widget title;
-  final Widget subtitle;
-  final Widget leading;
-  final Widget trailing;
-  final Widget body;
-
-  const _ViewUnitCard({
-    @required this.title,
-    @required this.body,
-    this.subtitle,
-    this.leading,
-    this.trailing,
-  });
-
-  @override
-  build(context) {
-    final theme = Theme.of(context);
-    return Column(
-      children: [
-        ListTile(
-          title: DefaultTextStyle(
-            style: theme.textTheme.title,
-            child: title,
-          ),
-          leading: leading,
-          subtitle: subtitle,
-          trailing: trailing,
-        ),
-        Padding(
-          child: body,
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        ),
-      ],
-      crossAxisAlignment: CrossAxisAlignment.start,
-    );
-  }
-}
-
-class _SimpleGrid extends StatelessWidget {
-  final Map<String, Widget> data;
-  final Color oddColor;
-
-  const _SimpleGrid({
-    this.data,
-    this.oddColor,
-  });
-
-  @override
-  build(context) {
-    final theme = Theme.of(context);
-    final c = data.entries;
-    final results = mapIndexed<Widget, MapEntry<String, Widget>>(c, (i, e) {
-      return Container(
-        padding: const EdgeInsets.all(8),
-        color: i.isOdd ? null : oddColor ?? theme.primaryColor,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text(e.key),
-                e.value,
-              ],
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            )
-          ],
-        ),
-      );
-    }).toList();
-    return Column(
-      children: results,
-    );
-  }
-}
-
 class _ViewUnitKeywords extends StatelessWidget {
   final ArmyUnit unit;
 
@@ -343,25 +279,7 @@ class _ViewUnitKeywords extends StatelessWidget {
   @override
   build(context) {
     final keywords = getCatalog(context).toUnit(unit.unit).keywords;
-    return ListView(
-      padding: const EdgeInsets.all(0),
-      primary: false,
-      shrinkWrap: true,
-      children: ListTile.divideTiles(
-        context: context,
-        tiles: keywords.entries.map(
-          (e) {
-            return ListTile(
-              title: Text(
-                '${formatKeyword(e.key)} ${e.value}',
-              ),
-              contentPadding: const EdgeInsets.all(0),
-              trailing: const Icon(Icons.chevron_right),
-            );
-          },
-        ),
-      ).toList(),
-    );
+    return KeywordsList(keywords: keywords);
   }
 }
 
@@ -399,9 +317,9 @@ class _ViewUnitUpgrades extends StatelessWidget {
               subtitle: Text(
                 '${toTitleCase(upgrade.type.name)}, ${upgrade.points} Points',
               ),
-              // TODO: Add navigation for details of the upgrade.
-              // And/or consider a points box here like previous page.
-              // TODO: Add exhaustible icon.
+              onTap: () {
+                ViewUpgradePage.navigateTo(context, upgrade);
+              },
             ),
           );
         }),
@@ -427,67 +345,33 @@ class _ViewUnitWeapons extends StatelessWidget {
       children: ListTile.divideTiles(
         context: context,
         tiles: WeaponView.all(getCatalog(context), unit).map((weapon) {
-          var subtitle = '(${weapon.miniatures}) ${weapon.range}';
-          if (weapon.keyword.isNotEmpty) {
-            subtitle = '$subtitle: ${weapon.keyword}';
-          }
-          return ListTile(
-            title: Text(
-              weapon.name,
-              overflow: TextOverflow.ellipsis,
-            ),
-            contentPadding: const EdgeInsets.all(0),
-            trailing: _buildDice(weapon.dice),
-            subtitle: Text(subtitle),
-          );
+          return WeaponListTile(weapon: weapon);
         }),
       ).toList(),
     );
   }
+}
 
-  Widget _buildDice(Iterable<AttackDice> display) {
-    final dice = display.map((d) {
-      return Padding(
-        padding: const EdgeInsets.only(right: 8),
-        child: SizedBox(
-          width: 10,
-          height: 10,
-          child: AttackDiceIcon(dice: d),
-        ),
-      );
-    }).toList();
-    return Column(
-      children: [
-        Row(
-          children: dice.take(3).toList(),
-          mainAxisSize: MainAxisSize.min,
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: dice.length > 3 ? 8 : 0),
-          child: Row(
-            children: dice.skip(3).toList(),
-            mainAxisSize: MainAxisSize.min,
-          ),
-        ),
-      ],
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-    );
-  }
+Iterable<Upgrade> _eligibleUpgradesFor(Catalog catalog, ArmyUnit unit) {
+  final details = catalog.toUnit(unit.unit);
+  final current = unit.upgrades;
+  return catalog
+      .upgradesForUnit(unit.unit)
+      .where((u) => !current.contains(u.toRef()))
+      .where((u) =>
+          current.where((o) => catalog.toUpgrade(o).type == u.type).length <
+          details.upgrades[u.type]);
 }
 
 class _AddUpgradeDialog extends StatelessWidget {
-  final ArmyUnit unit;
+  final Iterable<Upgrade> upgrades;
 
   const _AddUpgradeDialog({
-    @required this.unit,
-  }) : assert(unit != null);
+    @required this.upgrades,
+  }) : assert(upgrades != null);
 
   @override
   build(context) {
-    final catalog = getCatalog(context);
-    final upgrades = catalog.upgradesForUnit(unit.unit);
-
     return SimpleDialog(
       children: upgrades.map((upgrade) {
         return ListTile(

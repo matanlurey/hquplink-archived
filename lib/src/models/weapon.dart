@@ -12,7 +12,7 @@ class WeaponView {
 
     final upgrades = unit.upgrades.map(catalog.toUpgrade);
     yield* upgrades.where((u) => u.weapon != null).map((u) {
-      return WeaponView.fromUpgrade(catalog, unit, u);
+      return WeaponView.fromUpgradedUnit(catalog, unit, u);
     });
   }
 
@@ -23,7 +23,7 @@ class WeaponView {
   final String range;
 
   /// Formatted keywords of the weapon.
-  final String keyword;
+  final BuiltMap<Keyword, String> keywords;
 
   /// Number of miniatures that carry this weapon.
   final int miniatures;
@@ -34,7 +34,7 @@ class WeaponView {
   const WeaponView._({
     @required this.name,
     @required this.range,
-    @required this.keyword,
+    @required this.keywords,
     @required this.miniatures,
     @required this.dice,
   });
@@ -44,6 +44,16 @@ class WeaponView {
 
   @override
   int get hashCode => name.hashCode;
+
+  factory WeaponView(Weapon weapon, {int miniatures = 1}) {
+    return WeaponView._(
+      name: weapon.name,
+      range: formatRange(weapon),
+      keywords: weapon.keywords,
+      miniatures: miniatures,
+      dice: flattenDice(weapon.dice),
+    );
+  }
 
   /// Create a built-in weapon.
   factory WeaponView.fromBuiltIn(
@@ -66,7 +76,7 @@ class WeaponView {
     return WeaponView._(
       name: weapon.name,
       range: formatRange(weapon),
-      keyword: formatKeywords(weapon.keywords).join(', '),
+      keywords: weapon.keywords,
       miniatures: totalMinisWithWeapon,
       dice: flattenDice(weapon.dice),
     );
@@ -79,7 +89,7 @@ class WeaponView {
   }
 
   /// Creates an upgrade weapon.
-  factory WeaponView.fromUpgrade(
+  factory WeaponView.fromUpgradedUnit(
     Catalog catalog,
     ArmyUnit unit,
     Upgrade upgrade,
@@ -96,11 +106,13 @@ class WeaponView {
     return WeaponView._(
       name: weapon.name,
       range: formatRange(weapon),
-      keyword: formatKeywords(weapon.keywords).join(', '),
+      keywords: weapon.keywords,
       dice: flattenDice(weapon.dice),
       miniatures: withWeapon,
     );
   }
+
+  String get keywordList => formatKeywords(keywords).join(', ');
 
   /// Returns a [keyword] with the value of `'X'` removed if necessary.
   ///
