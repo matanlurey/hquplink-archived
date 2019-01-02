@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
+import 'package:hquplink/pages.dart';
 import 'package:hquplink/patterns.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
@@ -357,6 +358,9 @@ class _ViewUnitKeywords extends StatelessWidget {
               ),
               contentPadding: const EdgeInsets.all(0),
               trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                ViewKeywordPage.navigateTo(context, e.key);
+              },
             );
           },
         ),
@@ -427,51 +431,9 @@ class _ViewUnitWeapons extends StatelessWidget {
       children: ListTile.divideTiles(
         context: context,
         tiles: WeaponView.all(getCatalog(context), unit).map((weapon) {
-          var subtitle = '(${weapon.miniatures}) ${weapon.range}';
-          if (weapon.keyword.isNotEmpty) {
-            subtitle = '$subtitle: ${weapon.keyword}';
-          }
-          return ListTile(
-            title: Text(
-              weapon.name,
-              overflow: TextOverflow.ellipsis,
-            ),
-            contentPadding: const EdgeInsets.all(0),
-            trailing: _buildDice(weapon.dice),
-            subtitle: Text(subtitle),
-          );
+          return WeaponListTile(weapon: weapon);
         }),
       ).toList(),
-    );
-  }
-
-  Widget _buildDice(Iterable<AttackDice> display) {
-    final dice = display.map((d) {
-      return Padding(
-        padding: const EdgeInsets.only(right: 8),
-        child: SizedBox(
-          width: 10,
-          height: 10,
-          child: AttackDiceIcon(dice: d),
-        ),
-      );
-    }).toList();
-    return Column(
-      children: [
-        Row(
-          children: dice.take(3).toList(),
-          mainAxisSize: MainAxisSize.min,
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: dice.length > 3 ? 8 : 0),
-          child: Row(
-            children: dice.skip(3).toList(),
-            mainAxisSize: MainAxisSize.min,
-          ),
-        ),
-      ],
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
     );
   }
 }
@@ -486,7 +448,10 @@ class _AddUpgradeDialog extends StatelessWidget {
   @override
   build(context) {
     final catalog = getCatalog(context);
-    final upgrades = catalog.upgradesForUnit(unit.unit);
+    final current = unit.upgrades;
+    final upgrades = catalog
+        .upgradesForUnit(unit.unit)
+        .where((u) => !current.contains(u.toRef()));
 
     return SimpleDialog(
       children: upgrades.map((upgrade) {

@@ -13,6 +13,7 @@ export 'src/widgets/icons/unit_icon.dart';
 export 'src/widgets/icons/upgrade_icon.dart';
 export 'src/widgets/misc/dismiss_background.dart';
 export 'src/widgets/misc/faction_sliver_header.dart';
+export 'src/widgets/misc/weapon_tile.dart';
 
 final _matcher = RegExp(r'[_.\- ]+(\w|$)');
 
@@ -34,22 +35,28 @@ Color factionColor([Faction faction]) {
 
 /// Converts a `hyphen-case` [input] string to `'Title Case'`.
 String toTitleCase(String input) {
-  final result = input.replaceAllMapped(
+  final replaced = input.replaceAllMapped(
     _matcher,
     (m) => m.group(0).toUpperCase(),
   );
-  return result[0].toUpperCase() + result.substring(1);
+  final result = replaced[0].toUpperCase() + replaced.substring(1);
+  return result.replaceAll('-', ' ');
 }
 
 /// Returns a [keyword] with the value of `'X'` removed if necessary.
 ///
 /// For example, `formatKeyword(Keyword.impactX)` returns `'Impact'`.
 String formatKeyword(Keyword keyword) {
-  final word = toTitleCase(keyword.name).replaceAll('-', ' ');
+  final word = toTitleCase(keyword.name);
   if (word.endsWith(' X')) {
     return '${word.substring(0, word.length - 2)}';
   }
   return word;
+}
+
+/// Returns [input] with all extraneous whitespace removed.
+String collapseWhitespace(String input) {
+  return input.split('\n').map((s) => s.trim()).join(' ').trim();
 }
 
 /// Performs [Iterable.map] including the index of the element mapped over.
