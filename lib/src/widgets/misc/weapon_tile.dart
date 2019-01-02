@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hquplink/models.dart';
+import 'package:hquplink/pages.dart';
 import 'package:hquplink/widgets.dart';
 
 /// Displays details about the view model of a [weapon].
@@ -12,10 +13,10 @@ class WeaponListTile extends StatelessWidget {
         super(key: Key(weapon.name));
 
   @override
-  build(_) {
-    var subtitle = '(${weapon.miniatures}) ${weapon.range}';
-    if (weapon.keyword.isNotEmpty) {
-      subtitle = '$subtitle: ${weapon.keyword}';
+  build(context) {
+    var subtitle = weapon.range;
+    if (weapon.keywords.isNotEmpty) {
+      subtitle = '$subtitle: ${weapon.keywordList}';
     }
     return ListTile(
       title: Text(
@@ -23,12 +24,22 @@ class WeaponListTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       contentPadding: const EdgeInsets.all(0),
-      trailing: _buildDice(weapon.dice),
+      trailing: DiceDisplay(display: weapon.dice),
       subtitle: Text(subtitle),
+      onTap: () => ViewWeaponPage.navigateTo(context, weapon),
     );
   }
+}
 
-  Widget _buildDice(Iterable<AttackDice> display) {
+class DiceDisplay extends StatelessWidget {
+  final Iterable<AttackDice> display;
+
+  const DiceDisplay({
+    @required this.display,
+  }) : assert(display != null);
+
+  @override
+  build(_) {
     final dice = display.map((d) {
       return Padding(
         padding: const EdgeInsets.only(right: 8),

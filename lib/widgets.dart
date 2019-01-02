@@ -13,6 +13,9 @@ export 'src/widgets/icons/unit_icon.dart';
 export 'src/widgets/icons/upgrade_icon.dart';
 export 'src/widgets/misc/dismiss_background.dart';
 export 'src/widgets/misc/faction_sliver_header.dart';
+export 'src/widgets/misc/keyword_list.dart';
+export 'src/widgets/misc/simple_data_card.dart';
+export 'src/widgets/misc/simple_data_grid.dart';
 export 'src/widgets/misc/weapon_tile.dart';
 
 final _matcher = RegExp(r'[_.\- ]+(\w|$)');

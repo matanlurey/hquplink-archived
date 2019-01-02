@@ -8,6 +8,7 @@ class ViewKeywordPage extends StatelessWidget {
       context,
       MaterialPageRoute<void>(
         builder: (_) => ViewKeywordPage(keyword: keyword),
+        fullscreenDialog: true,
       ),
     );
   }
