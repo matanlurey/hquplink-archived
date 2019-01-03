@@ -23,6 +23,12 @@ class _$Simulation extends Simulation {
   final int dodge;
   @override
   final int aim;
+  @override
+  final int pierce;
+  @override
+  final int impact;
+  @override
+  final bool armor;
 
   factory _$Simulation([void updates(SimulationBuilder b)]) =>
       (new SimulationBuilder()..update(updates)).build();
@@ -35,7 +41,10 @@ class _$Simulation extends Simulation {
       this.attackSurge,
       this.cover,
       this.dodge,
-      this.aim})
+      this.aim,
+      this.pierce,
+      this.impact,
+      this.armor})
       : super._() {
     if (attack == null) {
       throw new BuiltValueNullFieldError('Simulation', 'attack');
@@ -54,6 +63,15 @@ class _$Simulation extends Simulation {
     }
     if (aim == null) {
       throw new BuiltValueNullFieldError('Simulation', 'aim');
+    }
+    if (pierce == null) {
+      throw new BuiltValueNullFieldError('Simulation', 'pierce');
+    }
+    if (impact == null) {
+      throw new BuiltValueNullFieldError('Simulation', 'impact');
+    }
+    if (armor == null) {
+      throw new BuiltValueNullFieldError('Simulation', 'armor');
     }
   }
 
@@ -75,7 +93,10 @@ class _$Simulation extends Simulation {
         attackSurge == other.attackSurge &&
         cover == other.cover &&
         dodge == other.dodge &&
-        aim == other.aim;
+        aim == other.aim &&
+        pierce == other.pierce &&
+        impact == other.impact &&
+        armor == other.armor;
   }
 
   @override
@@ -85,13 +106,21 @@ class _$Simulation extends Simulation {
             $jc(
                 $jc(
                     $jc(
-                        $jc($jc($jc(0, attack.hashCode), context.hashCode),
-                            defense.hashCode),
-                        hasDefenseSurge.hashCode),
-                    attackSurge.hashCode),
-                cover.hashCode),
-            dodge.hashCode),
-        aim.hashCode));
+                        $jc(
+                            $jc(
+                                $jc(
+                                    $jc(
+                                        $jc($jc(0, attack.hashCode),
+                                            context.hashCode),
+                                        defense.hashCode),
+                                    hasDefenseSurge.hashCode),
+                                attackSurge.hashCode),
+                            cover.hashCode),
+                        dodge.hashCode),
+                    aim.hashCode),
+                pierce.hashCode),
+            impact.hashCode),
+        armor.hashCode));
   }
 
   @override
@@ -104,7 +133,10 @@ class _$Simulation extends Simulation {
           ..add('attackSurge', attackSurge)
           ..add('cover', cover)
           ..add('dodge', dodge)
-          ..add('aim', aim))
+          ..add('aim', aim)
+          ..add('pierce', pierce)
+          ..add('impact', impact)
+          ..add('armor', armor))
         .toString();
   }
 }
@@ -146,6 +178,18 @@ class SimulationBuilder implements Builder<Simulation, SimulationBuilder> {
   int get aim => _$this._aim;
   set aim(int aim) => _$this._aim = aim;
 
+  int _pierce;
+  int get pierce => _$this._pierce;
+  set pierce(int pierce) => _$this._pierce = pierce;
+
+  int _impact;
+  int get impact => _$this._impact;
+  set impact(int impact) => _$this._impact = impact;
+
+  bool _armor;
+  bool get armor => _$this._armor;
+  set armor(bool armor) => _$this._armor = armor;
+
   SimulationBuilder();
 
   SimulationBuilder get _$this {
@@ -158,6 +202,9 @@ class SimulationBuilder implements Builder<Simulation, SimulationBuilder> {
       _cover = _$v.cover;
       _dodge = _$v.dodge;
       _aim = _$v.aim;
+      _pierce = _$v.pierce;
+      _impact = _$v.impact;
+      _armor = _$v.armor;
       _$v = null;
     }
     return this;
@@ -189,7 +236,10 @@ class SimulationBuilder implements Builder<Simulation, SimulationBuilder> {
               attackSurge: attackSurge,
               cover: cover,
               dodge: dodge,
-              aim: aim);
+              aim: aim,
+              pierce: pierce,
+              impact: impact,
+              armor: armor);
     } catch (_) {
       String _$failedField;
       try {
