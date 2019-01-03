@@ -105,10 +105,15 @@ class _AppShellState extends State<AppShell> {
                     leading: const Icon(Icons.casino),
                     title: const Text('Dice Simulator'),
                     onTap: () {
-                      Navigator.push<void>(context,
-                          MaterialPageRoute(builder: (_) {
-                        return const DiceSimulatorPage();
-                      }));
+                      Navigator.pop(context);
+                      Navigator.push<void>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) {
+                            return const DiceSimulatorPage();
+                          },
+                        ),
+                      );
                     },
                   );
                 },

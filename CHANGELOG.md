@@ -1,4 +1,5 @@
 * Added _cover_ to the dice simulation page.
+* Close the drawer when dice simulation is opened.
 
 ## 0.1.0+9
 
