@@ -19,7 +19,10 @@ abstract class Simulation implements Built<Simulation, SimulationBuilder> {
       ..hasDefenseSurge = false
       ..cover = 0
       ..dodge = 0
-      ..aim = 0);
+      ..aim = 0
+      ..pierce = 0
+      ..impact = 0
+      ..armor = false);
     if (builder != null) {
       return intermediate.rebuild(builder);
     }
@@ -65,6 +68,15 @@ abstract class Simulation implements Built<Simulation, SimulationBuilder> {
   /// Amount of aim tokens.
   int get aim;
 
+  /// Pierce in the dice pool.
+  int get pierce;
+
+  /// Impact in the dice pool.
+  int get impact;
+
+  /// Whether armor is in the defense.
+  bool get armor;
+
   /// Computes and returns the expected wounds.
   double expectedWounds() {
     // Possible attacks, without surge.
@@ -84,6 +96,9 @@ abstract class Simulation implements Built<Simulation, SimulationBuilder> {
                   dice: defense,
                   hasDefenseSurge: hasDefenseSurge,
                   cover: cover,
+                  pierce: pierce,
+                  impact: impact,
+                  armor: armor,
                 );
           },
         ) /
@@ -154,22 +169,57 @@ class _ConvertedAttackFrame {
     @required DefenseDice dice,
     @required bool hasDefenseSurge,
     @required int cover,
+    @required int pierce,
+    @required int impact,
+    @required bool armor,
   }) {
     // Hits with cover.
-    final totalHits = math.max(this.totalHits - cover, 0);
-    final totalDice = totalHits + totalCrits;
+    var totalHits = math.max(this.totalHits - cover, 0);
+    var totalCrits = this.totalCrits;
 
-    if (totalDice <= 0) {
+    // Apply armor and impact.
+    if (armor) {
+      while (totalHits > 0 && impact > 0) {
+        impact--;
+        totalHits--;
+        totalCrits++;
+      }
+      totalHits = 0;
+    }
+
+    // Determine total amount of defense wounds and possible wounds.l
+    final possibleWounds = totalHits + totalCrits;
+
+    // No point in rolling defensive dice if we aren't going to hit anyway.
+    if (possibleWounds <= 0) {
       return 0;
     }
 
+    // Determine chances of blocking every possible wound.
     final blockSides = dice.sides
         .where((s) =>
             s == DefenseDiceSide.block ||
             hasDefenseSurge && s == DefenseDiceSide.surge)
         .length;
     final blockChance = blockSides / dice.sides.length;
-    return totalDice * (1 - blockChance);
+
+    // Determine "expected" blocks, applying pierce.
+    final expectedBlocks = () {
+      var result = 0.0;
+      for (var i = 0; i < possibleWounds; i++) {
+        // Apply pierce.
+        if (pierce > 0) {
+          pierce--;
+          continue;
+        }
+
+        // Add expected block chance.
+        result += blockChance;
+      }
+      return result;
+    }();
+
+    return possibleWounds - expectedBlocks;
   }
 }
 

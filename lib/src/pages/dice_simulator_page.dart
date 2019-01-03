@@ -41,7 +41,7 @@ class _DiceSimulatorState extends State<DiceSimulatorPage> {
               Card(
                 child: ViewDataCard(
                     title: const Text('Results'),
-                    subtitle: const Text('Expected at least 50% of the time'),
+                    subtitle: const Text('Expected results'),
                     trailing: const Icon(Icons.assessment),
                     body: Column(
                       children: [
@@ -165,6 +165,46 @@ class _DiceSimulatorState extends State<DiceSimulatorPage> {
                           ),
                         ],
                       ),
+                      ListTile(
+                        leading: const Text('Pierce'),
+                        contentPadding: const EdgeInsets.all(0),
+                        title: Text('${simulation.pierce}'),
+                        trailing: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: () => _edit((b) => b.pierce++),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: simulation.pierce > 0
+                                  ? () => _edit((b) => b.pierce--)
+                                  : null,
+                            ),
+                          ],
+                          mainAxisSize: MainAxisSize.min,
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Text('Impact'),
+                        contentPadding: const EdgeInsets.all(0),
+                        title: Text('${simulation.impact}'),
+                        trailing: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.add),
+                              onPressed: () => _edit((b) => b.impact++),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: simulation.impact > 0
+                                  ? () => _edit((b) => b.impact--)
+                                  : null,
+                            ),
+                          ],
+                          mainAxisSize: MainAxisSize.min,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -276,6 +316,14 @@ class _DiceSimulatorState extends State<DiceSimulatorPage> {
                                 ),
                               ],
                               mainAxisSize: MainAxisSize.min,
+                            ),
+                          ),
+                          ListTile(
+                            contentPadding: const EdgeInsets.all(0),
+                            leading: const Text('Armor'),
+                            trailing: Switch(
+                              value: simulation.armor,
+                              onChanged: (v) => _edit((b) => b.armor = v),
                             ),
                           ),
                         ],
