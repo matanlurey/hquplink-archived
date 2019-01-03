@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Simulation;
 import 'package:hquplink/models.dart';
+import 'package:hquplink/pages.dart';
 import 'package:hquplink/widgets.dart';
 
 class ViewWeaponPage extends StatelessWidget {
@@ -27,6 +28,28 @@ class ViewWeaponPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(toTitleCase(weapon.name)),
+        actions: [
+          Builder(
+            builder: (context) {
+              return IconButton(
+                icon: const Icon(Icons.casino),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) {
+                        return DiceSimulatorPage(
+                          initialData: Simulation((b) => b),
+                        );
+                      },
+                      fullscreenDialog: true,
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
