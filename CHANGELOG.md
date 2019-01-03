@@ -1,3 +1,5 @@
+* Added _cover_ to the dice simulation page.
+
 ## 0.1.0+9
 
 * Added a dice simulation page, as well as shortcuts from weapons/units.
