@@ -46,6 +46,7 @@ class _DiceSimulatorState extends State<DiceSimulatorPage> {
                     body: Column(
                       children: [
                         ListTile(
+                          contentPadding: const EdgeInsets.all(0),
                           leading: const SizedBox(
                             width: 12,
                             height: 12,
@@ -77,6 +78,7 @@ class _DiceSimulatorState extends State<DiceSimulatorPage> {
                         children: simulation.attack.keys.map((type) {
                           final value = simulation.attack[type];
                           return ListTile(
+                            contentPadding: const EdgeInsets.all(0),
                             title: Text('$value'),
                             leading: SizedBox(
                               width: 12,
@@ -222,39 +224,51 @@ class _DiceSimulatorState extends State<DiceSimulatorPage> {
                   ),
                   body: Column(
                     children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: SizedBox(
-                              width: 12,
-                              height: 12,
-                              child: Opacity(
-                                child: DefenseDiceIcon(dice: DefenseDice.white),
-                                opacity: simulation.defense == DefenseDice.white
-                                    ? 1.0
-                                    : 0.3,
+                      ListTile(
+                        contentPadding: const EdgeInsets.all(0),
+                        leading: const Text('Dice'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: SizedBox(
+                                width: 12,
+                                height: 12,
+                                child: Opacity(
+                                  child: DefenseDiceIcon(
+                                    dice: DefenseDice.white,
+                                  ),
+                                  opacity:
+                                      simulation.defense == DefenseDice.white
+                                          ? 1.0
+                                          : 0.3,
+                                ),
                               ),
+                              onPressed: () {
+                                _edit(
+                                  (b) => b.defense = DefenseDice.white,
+                                );
+                              },
                             ),
-                            onPressed: () {
-                              _edit((b) => b.defense = DefenseDice.white);
-                            },
-                          ),
-                          IconButton(
-                            icon: SizedBox(
-                              width: 12,
-                              height: 12,
-                              child: Opacity(
-                                child: DefenseDiceIcon(dice: DefenseDice.red),
-                                opacity: simulation.defense == DefenseDice.red
-                                    ? 1.0
-                                    : 0.3,
+                            IconButton(
+                              icon: SizedBox(
+                                width: 12,
+                                height: 12,
+                                child: Opacity(
+                                  child: DefenseDiceIcon(
+                                    dice: DefenseDice.red,
+                                  ),
+                                  opacity: simulation.defense == DefenseDice.red
+                                      ? 1.0
+                                      : 0.3,
+                                ),
                               ),
+                              onPressed: () {
+                                _edit((b) => b.defense = DefenseDice.red);
+                              },
                             ),
-                            onPressed: () {
-                              _edit((b) => b.defense = DefenseDice.red);
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       Row(
                         children: [
