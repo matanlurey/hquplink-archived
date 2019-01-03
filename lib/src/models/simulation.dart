@@ -42,6 +42,10 @@ abstract class Simulation implements Built<Simulation, SimulationBuilder> {
     });
   }
 
+  /// Context for this simulation, if any.
+  @nullable
+  String get context;
+
   /// Type of defense dice.
   DefenseDice get defense;
 

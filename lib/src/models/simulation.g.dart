@@ -10,6 +10,8 @@ class _$Simulation extends Simulation {
   @override
   final BuiltMap<AttackDice, int> attack;
   @override
+  final String context;
+  @override
   final DefenseDice defense;
   @override
   final bool hasDefenseSurge;
@@ -27,6 +29,7 @@ class _$Simulation extends Simulation {
 
   _$Simulation._(
       {this.attack,
+      this.context,
       this.defense,
       this.hasDefenseSurge,
       this.attackSurge,
@@ -66,6 +69,7 @@ class _$Simulation extends Simulation {
     if (identical(other, this)) return true;
     return other is Simulation &&
         attack == other.attack &&
+        context == other.context &&
         defense == other.defense &&
         hasDefenseSurge == other.hasDefenseSurge &&
         attackSurge == other.attackSurge &&
@@ -80,7 +84,9 @@ class _$Simulation extends Simulation {
         $jc(
             $jc(
                 $jc(
-                    $jc($jc($jc(0, attack.hashCode), defense.hashCode),
+                    $jc(
+                        $jc($jc($jc(0, attack.hashCode), context.hashCode),
+                            defense.hashCode),
                         hasDefenseSurge.hashCode),
                     attackSurge.hashCode),
                 cover.hashCode),
@@ -92,6 +98,7 @@ class _$Simulation extends Simulation {
   String toString() {
     return (newBuiltValueToStringHelper('Simulation')
           ..add('attack', attack)
+          ..add('context', context)
           ..add('defense', defense)
           ..add('hasDefenseSurge', hasDefenseSurge)
           ..add('attackSurge', attackSurge)
@@ -109,6 +116,10 @@ class SimulationBuilder implements Builder<Simulation, SimulationBuilder> {
   MapBuilder<AttackDice, int> get attack =>
       _$this._attack ??= new MapBuilder<AttackDice, int>();
   set attack(MapBuilder<AttackDice, int> attack) => _$this._attack = attack;
+
+  String _context;
+  String get context => _$this._context;
+  set context(String context) => _$this._context = context;
 
   DefenseDice _defense;
   DefenseDice get defense => _$this._defense;
@@ -140,6 +151,7 @@ class SimulationBuilder implements Builder<Simulation, SimulationBuilder> {
   SimulationBuilder get _$this {
     if (_$v != null) {
       _attack = _$v.attack?.toBuilder();
+      _context = _$v.context;
       _defense = _$v.defense;
       _hasDefenseSurge = _$v.hasDefenseSurge;
       _attackSurge = _$v.attackSurge;
@@ -171,6 +183,7 @@ class SimulationBuilder implements Builder<Simulation, SimulationBuilder> {
       _$result = _$v ??
           new _$Simulation._(
               attack: attack.build(),
+              context: context,
               defense: defense,
               hasDefenseSurge: hasDefenseSurge,
               attackSurge: attackSurge,

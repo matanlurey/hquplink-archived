@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:built_collection/built_collection.dart';
+import 'package:flutter/material.dart' hide Simulation;
 import 'package:hquplink/models.dart';
 import 'package:hquplink/pages.dart';
 import 'package:hquplink/patterns.dart';
@@ -64,7 +65,7 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
             onMenuPressed: (option) async {
               switch (option) {
                 case _ViewUnitAction.deleteUnit:
-                  final details = getCatalog(context).toUnit(value.unit);
+                  final details = catalog.toUnit(value.unit);
                   if (!await showConfirmDialog(
                     context: context,
                     discardText: 'Delete',
@@ -74,6 +75,8 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                   }
                   widget.onUpdate(null);
                   return Navigator.pop(context);
+                case _ViewUnitAction.simulateDice:
+                  return _simulateDice(catalog);
               }
             },
             menu: const [
@@ -84,6 +87,13 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                 ),
                 value: _ViewUnitAction.deleteUnit,
               ),
+              PopupMenuItem(
+                child: ListTile(
+                  leading: const Icon(Icons.casino),
+                  title: const Text('Simulate'),
+                ),
+                value: _ViewUnitAction.simulateDice,
+              )
             ],
             bottom: _ViewUnitHeader(
               unit: value,
@@ -147,6 +157,10 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                     Card(
                       child: ViewDataCard(
                         title: const Text('Weapons'),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.casino),
+                          onPressed: () => _simulateDice(catalog),
+                        ),
                         body: _ViewUnitWeapons(
                           unit: value,
                         ),
@@ -163,6 +177,52 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
             ]),
           ),
         ],
+      ),
+    );
+  }
+
+  void _simulateDice(Catalog catalog) async {
+    final miniatures = catalog.sumMiniatures(value);
+    final weapons = await Navigator.push(
+      context,
+      MaterialPageRoute<Map<Weapon, int>>(
+        builder: (_) {
+          return _SelectWeaponsDialog(
+            weapons: WeaponView.all(
+              getCatalog(context),
+              value,
+            ).toList(),
+            totalMiniatures: miniatures,
+          );
+        },
+        fullscreenDialog: true,
+      ),
+    );
+    if (weapons == null) {
+      return;
+    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) {
+          final attack = <AttackDice, int>{};
+          final details = catalog.toUnit(value.unit);
+          weapons.forEach((weapon, amount) {
+            weapon.dice.map((k, v) => MapEntry(k, v * amount)).forEach((k, v) {
+              attack.putIfAbsent(k, () => 0);
+              attack[k] += v;
+            });
+          });
+          return DiceSimulatorPage(
+            initialData: Simulation(
+              (b) => b
+                ..attack = MapBuilder(attack)
+                ..attackSurge = details.attackSurge
+                ..context = 'Unit: ${details.name}',
+            ),
+          );
+        },
+        fullscreenDialog: true,
       ),
     );
   }
@@ -229,6 +289,7 @@ Widget _buildDefenseValue(Unit details) {
 
 enum _ViewUnitAction {
   deleteUnit,
+  simulateDice,
 }
 
 class _ViewUnitHeader extends StatelessWidget {
@@ -386,6 +447,106 @@ class _AddUpgradeDialog extends StatelessWidget {
         );
       }).toList(),
       title: const Text('Add Upgrade'),
+    );
+  }
+}
+
+class _SelectWeaponsDialog extends StatefulWidget {
+  final List<WeaponView> weapons;
+  final int totalMiniatures;
+
+  const _SelectWeaponsDialog({
+    @required this.weapons,
+    @required this.totalMiniatures,
+  }) : assert(weapons != null);
+
+  @override
+  createState() => _SelectWeaponsState();
+}
+
+class _SelectWeaponsState extends State<_SelectWeaponsDialog> {
+  List<int> selected;
+
+  @override
+  void initState() {
+    selected = new List.filled(widget.weapons.length, 0);
+    super.initState();
+  }
+
+  @override
+  build(_) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Select Weapons (${widget.totalMiniatures} Units)'),
+        actions: [
+          Builder(
+            builder: (context) {
+              return IconButton(
+                icon: const Icon(Icons.check),
+                onPressed: () {
+                  final results = <Weapon, int>{};
+                  for (var i = 0; i < widget.weapons.length; i++) {
+                    final weapon = widget.weapons[i];
+                    results[weapon.origin] = selected[i];
+                  }
+                  Navigator.pop(context, results);
+                },
+              );
+            },
+          )
+        ],
+      ),
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: mapIndexed<Widget, WeaponView>(
+                widget.weapons,
+                (index, weapon) {
+                  return ListTile(
+                    leading: Text('${selected[index]}'),
+                    title: Text(
+                      weapon.name,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () => setState(() => selected[index]++),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: selected[index] > 0
+                              ? () => setState(() => selected[index]--)
+                              : null,
+                        ),
+                      ],
+                      mainAxisSize: MainAxisSize.min,
+                    ),
+                    subtitle: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: DiceDisplay(
+                            display: weapon.dice,
+                          ),
+                        ),
+                        Text(
+                          '${weapon.range} ${weapon.keywordList}',
+                        ),
+                      ],
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                    isThreeLine: true,
+                  );
+                },
+              ).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
