@@ -1,3 +1,7 @@
+## 0.1.0+11
+
+* Added _armor_, _pierce_ and _impact_ to the simulation page.
+
 ## 0.1.0+10
 
 * Added _cover_ to the dice simulation page.
