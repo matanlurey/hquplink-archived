@@ -39,7 +39,14 @@ class ViewWeaponPage extends StatelessWidget {
                     MaterialPageRoute<void>(
                       builder: (_) {
                         return DiceSimulatorPage(
-                          initialData: Simulation((b) => b),
+                          initialData: Simulation(
+                            (b) => b
+                              ..attack = weapon.origin.dice.map((k, v) {
+                                return MapEntry(k, v * weapon.miniatures);
+                              }).toBuilder()
+                              ..attackSurge = weapon.surge
+                              ..context = 'Weapon: ${weapon.name}',
+                          ),
                         );
                       },
                       fullscreenDialog: true,

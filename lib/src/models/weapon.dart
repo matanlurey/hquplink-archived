@@ -16,6 +16,12 @@ class WeaponView {
     });
   }
 
+  /// Originating weapon.
+  final Weapon origin;
+
+  /// Whether the originating unit surges on attacks.
+  final AttackSurge surge;
+
   /// Name of the weapon.
   final String name;
 
@@ -32,11 +38,13 @@ class WeaponView {
   final List<AttackDice> dice;
 
   const WeaponView._({
+    @required this.origin,
     @required this.name,
     @required this.range,
     @required this.keywords,
     @required this.miniatures,
     @required this.dice,
+    this.surge,
   });
 
   @override
@@ -45,13 +53,19 @@ class WeaponView {
   @override
   int get hashCode => name.hashCode;
 
-  factory WeaponView(Weapon weapon, {int miniatures = 1}) {
+  factory WeaponView(
+    Weapon weapon, {
+    int miniatures = 1,
+    AttackSurge surge,
+  }) {
     return WeaponView._(
+      origin: weapon,
       name: weapon.name,
       range: formatRange(weapon),
       keywords: weapon.keywords,
       miniatures: miniatures,
       dice: flattenDice(weapon.dice),
+      surge: surge,
     );
   }
 
@@ -74,11 +88,13 @@ class WeaponView {
     }
 
     return WeaponView._(
+      origin: weapon,
       name: weapon.name,
       range: formatRange(weapon),
       keywords: weapon.keywords,
       miniatures: totalMinisWithWeapon,
       dice: flattenDice(weapon.dice),
+      surge: details.attackSurge,
     );
   }
 
@@ -104,11 +120,13 @@ class WeaponView {
     final withWeapon = upgrade.addsMiniature ? 1 : totalMinis;
 
     return WeaponView._(
+      origin: weapon,
       name: weapon.name,
       range: formatRange(weapon),
       keywords: weapon.keywords,
       dice: flattenDice(weapon.dice),
       miniatures: withWeapon,
+      surge: details.attackSurge,
     );
   }
 
