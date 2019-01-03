@@ -207,18 +207,31 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
         builder: (_) {
           final attack = <AttackDice, int>{};
           final details = catalog.toUnit(value.unit);
+          var impact = 0;
+          var pierce = 0;
           weapons.forEach((weapon, amount) {
             weapon.dice.map((k, v) => MapEntry(k, v * amount)).forEach((k, v) {
               attack.putIfAbsent(k, () => 0);
               attack[k] += v;
             });
+
+            impact += int.parse(
+                  weapon.keywords[Keyword.impactX] ?? '0',
+                ) *
+                amount;
+            pierce += int.parse(
+                  weapon.keywords[Keyword.pierceX] ?? '0',
+                ) *
+                amount;
           });
           return DiceSimulatorPage(
             initialData: Simulation(
               (b) => b
                 ..attack = MapBuilder(attack)
                 ..attackSurge = details.attackSurge
-                ..context = 'Unit: ${details.name}',
+                ..context = 'Unit: ${details.name}'
+                ..impact = impact
+                ..pierce = pierce,
             ),
           );
         },
