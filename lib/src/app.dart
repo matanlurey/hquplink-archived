@@ -47,14 +47,14 @@ class _AppShellState extends State<AppShell> {
   })  : assert(roster != null),
         assert(theme != null);
 
-  void updateRoster(void Function(RosterBuilder) update) {
+  void _updateRoster(void Function(RosterBuilder) update) {
     setState(() {
       roster = roster.rebuild(update);
       widget.onRosterUpdated(roster);
     });
   }
 
-  void addNewArmy(BuildContext context) async {
+  void _addNewArmy(BuildContext context) async {
     final catalog = getCatalog(context);
     final army = await Navigator.push(
       context,
@@ -68,7 +68,7 @@ class _AppShellState extends State<AppShell> {
       ),
     );
     if (army != null) {
-      updateRoster((b) => b.armies.add(army));
+      _updateRoster((b) => b.armies.add(army));
     }
   }
 
@@ -86,7 +86,7 @@ class _AppShellState extends State<AppShell> {
             return FloatingActionButton(
               child: const Icon(Icons.add),
               foregroundColor: Colors.white,
-              onPressed: () => addNewArmy(context),
+              onPressed: () => _addNewArmy(context),
             );
           },
         ),
@@ -131,7 +131,7 @@ class _AppShellState extends State<AppShell> {
           child: ListArmiesPage(
             initialArmies: roster.armies,
             onUpdate: (armies) {
-              updateRoster((b) => b.armies = armies.toBuilder());
+              _updateRoster((b) => b.armies = armies.toBuilder());
             },
           ),
         ),

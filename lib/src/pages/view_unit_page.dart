@@ -14,9 +14,13 @@ class ViewUnitPage extends StatefulWidget {
   /// Invoked when [unit] is updated. A value of `null` signifies deletion.
   final void Function(ArmyUnit) onUpdate;
 
+  /// Invoked when a copy of this unit should be added to the army.
+  final void Function(ArmyUnit) onAdd;
+
   const ViewUnitPage({
     @required this.unit,
     @required this.onUpdate,
+    @required this.onAdd,
   }) : assert(unit != null);
 
   @override
@@ -64,6 +68,12 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
             title: details.name,
             onMenuPressed: (option) async {
               switch (option) {
+                case _ViewUnitAction.copyUnit:
+                  final copy =
+                      value.rebuild((b) => b.id = catalog.createArmyUnit().id);
+                  widget.onAdd(copy);
+                  Navigator.pop(context);
+                  break;
                 case _ViewUnitAction.deleteUnit:
                   final details = catalog.toUnit(value.unit);
                   if (!await showConfirmDialog(
@@ -79,15 +89,23 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                   return _simulateDice(catalog);
               }
             },
-            menu: const [
+            menu: [
               PopupMenuItem(
+                child: const ListTile(
+                  leading: Icon(Icons.content_copy),
+                  title: Text('Copy Unit'),
+                ),
+                value: _ViewUnitAction.copyUnit,
+                enabled: !details.isUnique,
+              ),
+              const PopupMenuItem(
                 child: ListTile(
                   leading: const Icon(Icons.delete),
                   title: const Text('Delete Unit'),
                 ),
                 value: _ViewUnitAction.deleteUnit,
               ),
-              PopupMenuItem(
+              const PopupMenuItem(
                 child: ListTile(
                   leading: const Icon(Icons.casino),
                   title: const Text('Simulate'),
@@ -139,28 +157,26 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                         body: _ViewUnitKeywords(unit: value),
                       ),
                     ),
-                    Card(
-                      child: ViewDataCard(
-                        title: const Text('Upgrades'),
-                        body: Builder(
-                          builder: (context) {
-                            return _ViewUnitUpgrades(
-                              unit: value,
-                              onDelete: (upgrade) {
-                                return _deleteUpgrade(context, upgrade);
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+                    value.upgrades.isNotEmpty
+                        ? Card(
+                            child: ViewDataCard(
+                              title: const Text('Upgrades'),
+                              body: Builder(
+                                builder: (context) {
+                                  return _ViewUnitUpgrades(
+                                    unit: value,
+                                    onDelete: (upgrade) {
+                                      return _deleteUpgrade(context, upgrade);
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          )
+                        : Container(),
                     Card(
                       child: ViewDataCard(
                         title: const Text('Weapons'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.casino),
-                          onPressed: () => _simulateDice(catalog),
-                        ),
                         body: _ViewUnitWeapons(
                           unit: value,
                         ),
@@ -301,6 +317,7 @@ Widget _buildDefenseValue(Unit details) {
 }
 
 enum _ViewUnitAction {
+  copyUnit,
   deleteUnit,
   simulateDice,
 }

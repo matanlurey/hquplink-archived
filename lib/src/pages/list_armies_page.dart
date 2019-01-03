@@ -92,6 +92,9 @@ class _ListArmiesState extends Mutex<BuiltList<Army>, ListArmiesPage> {
                 }),
               );
             },
+            onAdd: (newArmy) {
+              setValue(value.rebuild((b) => b.add(newArmy)));
+            },
           );
         },
       ),
