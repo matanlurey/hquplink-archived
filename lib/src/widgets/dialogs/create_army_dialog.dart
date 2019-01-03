@@ -4,10 +4,13 @@ import 'package:hquplink/widgets.dart';
 
 class CreateArmyDialog extends StatefulWidget {
   final bool editExisting;
+  final bool copyExisting;
+
   final ArmyBuilder initialData;
 
   const CreateArmyDialog({
     this.editExisting = false,
+    this.copyExisting = false,
     @required this.initialData,
   }) : assert(initialData != null);
 
@@ -43,7 +46,9 @@ class _CreateArmyDialogState extends State<CreateArmyDialog> {
       appBar: AppBar(
         title: widget.editExisting
             ? const Text('Edit Army')
-            : const Text('Create Army'),
+            : widget.copyExisting
+                ? const Text('Copy Army')
+                : const Text('Create Army'),
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
@@ -85,11 +90,13 @@ class _CreateArmyDialogState extends State<CreateArmyDialog> {
                     Faction.darkSide,
                     height: 24,
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      army.faction = value;
-                    });
-                  },
+                  onChanged: widget.copyExisting
+                      ? null
+                      : (value) {
+                          setState(() {
+                            army.faction = value;
+                          });
+                        },
                 ),
                 RadioListTile<Faction>(
                   groupValue: army.faction,
@@ -99,11 +106,13 @@ class _CreateArmyDialogState extends State<CreateArmyDialog> {
                     Faction.lightSide,
                     height: 24,
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      army.faction = value;
-                    });
-                  },
+                  onChanged: widget.copyExisting
+                      ? null
+                      : (value) {
+                          setState(() {
+                            army.faction = value;
+                          });
+                        },
                 ),
               ],
               crossAxisAlignment: CrossAxisAlignment.start,

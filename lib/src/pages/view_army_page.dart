@@ -9,11 +9,14 @@ import 'package:hquplink/widgets.dart';
 /// Renders, and optionally, provides edits for a specific [Army].
 class ViewArmyPage extends StatefulWidget {
   final Army army;
+
   final void Function(Army) onUpdate;
+  final void Function(Army) onAdd;
 
   const ViewArmyPage({
     @required this.army,
     @required this.onUpdate,
+    @required this.onAdd,
   }) : assert(army != null);
 
   @override
@@ -45,6 +48,13 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
               ),
               PopupMenuItem(
                 child: ListTile(
+                  leading: const Icon(Icons.content_copy),
+                  title: const Text('Copy Army'),
+                ),
+                value: _ViewArmyMenuOptions.copy,
+              ),
+              PopupMenuItem(
+                child: ListTile(
                   leading: const Icon(Icons.delete),
                   title: const Text('Delete Army'),
                 ),
@@ -57,6 +67,8 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
                   return _deleteArmy(context);
                 case _ViewArmyMenuOptions.edit:
                   return _editArmy(context);
+                case _ViewArmyMenuOptions.copy:
+                  return _copyArmy(context);
               }
             },
             bottom: _ViewArmyHeader(army: value),
@@ -121,6 +133,9 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
                           }),
                         );
                       },
+                      onAdd: (newUnit) {
+                        setValue(value.rebuild((b) => b.units.add(newUnit)));
+                      },
                     );
                   }),
                 );
@@ -164,6 +179,27 @@ class _ArmyViewState extends Mutex<Army, ViewArmyPage> {
     );
     if (edited != null) {
       setValue(edited);
+    }
+  }
+
+  void _copyArmy(BuildContext context) async {
+    var copy = await Navigator.push(
+      context,
+      MaterialPageRoute<Army>(
+        builder: (_) {
+          return CreateArmyDialog(
+            initialData: value.toBuilder(),
+            editExisting: false,
+            copyExisting: true,
+          );
+        },
+        fullscreenDialog: true,
+      ),
+    );
+    if (copy != null) {
+      copy = copy.rebuild((b) => b.id = getCatalog(context).createArmy().id);
+      widget.onAdd(copy);
+      Navigator.pop(context);
     }
   }
 
@@ -234,6 +270,7 @@ class _ViewArmyHeader extends StatelessWidget {
 enum _ViewArmyMenuOptions {
   edit,
   delete,
+  copy,
 }
 
 class _PreviewUnitTile extends StatelessWidget {
