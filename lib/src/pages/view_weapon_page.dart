@@ -45,7 +45,13 @@ class ViewWeaponPage extends StatelessWidget {
                                 return MapEntry(k, v * weapon.miniatures);
                               }).toBuilder()
                               ..attackSurge = weapon.surge
-                              ..context = 'Weapon: ${weapon.name}',
+                              ..context = 'Weapon: ${weapon.name}'
+                              ..impact = int.parse(
+                                weapon.keywords[Keyword.impactX] ?? '0',
+                              )
+                              ..pierce = int.parse(
+                                weapon.keywords[Keyword.pierceX] ?? '0',
+                              ),
                           ),
                         );
                       },

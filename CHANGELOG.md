@@ -1,4 +1,5 @@
 * Minor UI improvements to the simulator page.
+* Transfer _impact_ and _pierce_ from a unit page.
 
 ## 0.1.0+11
 
