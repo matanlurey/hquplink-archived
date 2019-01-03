@@ -157,10 +157,6 @@ class _ViewUnitState extends Mutex<ArmyUnit, ViewUnitPage> {
                     Card(
                       child: ViewDataCard(
                         title: const Text('Weapons'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.casino),
-                          onPressed: () => _simulateDice(catalog),
-                        ),
                         body: _ViewUnitWeapons(
                           unit: value,
                         ),
