@@ -1,3 +1,5 @@
+## 0.1.0+12
+
 * Minor UI improvements to the simulator page.
 * Transfer _impact_ and _pierce_ from a unit page.
 * Remove duplciate way to go from the unit page to the simulator; use top menu.
