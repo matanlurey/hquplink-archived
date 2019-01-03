@@ -99,6 +99,20 @@ class _AppShellState extends State<AppShell> {
                   color: theme.primaryColor,
                 ),
               ),
+              Builder(
+                builder: (context) {
+                  return ListTile(
+                    leading: const Icon(Icons.casino),
+                    title: const Text('Dice Simulator'),
+                    onTap: () {
+                      Navigator.push<void>(context,
+                          MaterialPageRoute(builder: (_) {
+                        return const DiceSimulatorPage();
+                      }));
+                    },
+                  );
+                },
+              ),
               AboutListTile(
                 icon: const Icon(Icons.info),
                 applicationIcon: const Icon(Icons.info, color: Colors.white),
