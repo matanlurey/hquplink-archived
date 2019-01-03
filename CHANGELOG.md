@@ -1,5 +1,7 @@
+## 0.1.0+9
+
 * Added a dice simulation page, as well as shortcuts from weapons/units.
- 
+
 ## 0.1.0+8
 
 * Adding an upgrade no longer shows upgrades already present on a unit.
