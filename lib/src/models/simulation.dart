@@ -76,9 +76,17 @@ abstract class Simulation implements Built<Simulation, SimulationBuilder> {
     final convertedFrames = attackFrames.map((a) => a.convert(attackSurge));
 
     // Total expected wounds.
-    return convertedFrames.fold<double>(0, (e, f) {
-          return e + f.expectedWounds(defense, hasDefenseSurge);
-        }) /
+    return convertedFrames.fold<double>(
+          0,
+          (e, f) {
+            return e +
+                f.expectedWounds(
+                  dice: defense,
+                  hasDefenseSurge: hasDefenseSurge,
+                  cover: cover,
+                );
+          },
+        ) /
         attackFrames.length;
   }
 }
@@ -142,11 +150,19 @@ class _ConvertedAttackFrame {
   });
 
   // ignore: avoid_positional_boolean_parameters
-  double expectedWounds(DefenseDice dice, bool hasDefenseSurge) {
+  double expectedWounds({
+    @required DefenseDice dice,
+    @required bool hasDefenseSurge,
+    @required int cover,
+  }) {
+    // Hits with cover.
+    final totalHits = math.max(this.totalHits - cover, 0);
     final totalDice = totalHits + totalCrits;
-    if (totalDice == 0) {
+
+    if (totalDice <= 0) {
       return 0;
     }
+
     final blockSides = dice.sides
         .where((s) =>
             s == DefenseDiceSide.block ||

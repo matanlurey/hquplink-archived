@@ -27,7 +27,7 @@ class _DiceSimulatorState extends State<DiceSimulatorPage> {
   }
 
   @override
-  build(_) {
+  build(context) {
     final wounds = simulation.expectedWounds();
     return Scaffold(
       appBar: AppBar(
@@ -251,6 +251,32 @@ class _DiceSimulatorState extends State<DiceSimulatorPage> {
                             onPressed: () {
                               _edit((b) => b.hasDefenseSurge = true);
                             },
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          ListTile(
+                            leading: const Text('Cover'),
+                            contentPadding: const EdgeInsets.all(0),
+                            title: Text('${simulation.cover}'),
+                            trailing: Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.add),
+                                  onPressed: simulation.cover < 2
+                                      ? () => _edit((b) => b.cover++)
+                                      : null,
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.remove),
+                                  onPressed: simulation.cover > 0
+                                      ? () => _edit((b) => b.cover--)
+                                      : null,
+                                ),
+                              ],
+                              mainAxisSize: MainAxisSize.min,
+                            ),
                           ),
                         ],
                       ),
