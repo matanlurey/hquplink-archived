@@ -2,6 +2,7 @@
 
 import 'package:device_id/device_id.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hquplink/models.dart';
@@ -36,16 +37,19 @@ void run({
     assert(debugMode = true);
   }
 
-  // Default to not logged in.
-  auth ??= Auth(
-    firebaseAuth: FirebaseAuth.instance,
-    googleSignIn: GoogleSignIn(),
-  );
+  // Default to not logged in and not supported.
+  auth ??= Auth.disabled();
 
   // Resolve missing service classes in parallel as much as possible.
   await Future.wait(<Future<Object>>[
     _resolve(deviceId, () => DeviceId.getID),
-    _resolve(packageInfo, PackageInfo.fromPlatform),
+    _resolve(packageInfo, () async {
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        // TODO: Fix on iOS.
+        return PackageInfo();
+      }
+      return PackageInfo.fromPlatform();
+    }),
     _resolve(storage, () async {
       return JsonStorage.toDisk(
         (await getApplicationDocumentsDirectory()).path,

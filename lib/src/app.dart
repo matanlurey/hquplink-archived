@@ -108,12 +108,14 @@ class _AppShellState extends State<AppShell> {
           child: FlatButton.icon(
             icon: const Icon(Icons.person),
             label: const Text('Sign in with Google'),
-            onPressed: () async {
-              await auth.signIn();
-              setState(() {
-                // Notify that 'auth' may have changed.
-              });
-            },
+            onPressed: auth.isEnabled
+                ? () async {
+                    await auth.signIn();
+                    setState(() {
+                      // Notify that 'auth' may have changed.
+                    });
+                  }
+                : null,
           ),
         ),
         accountName: Container(),

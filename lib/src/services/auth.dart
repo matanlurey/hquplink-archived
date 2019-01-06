@@ -20,7 +20,13 @@ class Auth {
         assert(firebaseAuth != null),
         _firebaseAuth = firebaseAuth;
 
+  Auth.disabled()
+      : _googleSignIn = null,
+        _firebaseAuth = null;
+
   GoogleIdentity get identity => _googleUser;
+
+  bool get isEnabled => _googleSignIn != null;
 
   bool get isSignedIn => _firebaseUser != null;
 
