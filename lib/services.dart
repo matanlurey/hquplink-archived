@@ -1,9 +1,11 @@
 import 'package:flutter/widgets.dart';
 
+import 'src/services/auth.dart';
 import 'src/services/catalog.dart';
 import 'src/services/settings.dart';
 import 'src/services/storage.dart';
 
+export 'src/services/auth.dart';
 export 'src/services/catalog.dart';
 export 'src/services/settings.dart';
 export 'src/services/storage.dart';
@@ -112,6 +114,38 @@ class _SettingsModel extends InheritedWidget {
 
   @override
   int get hashCode => settings.hashCode;
+
+  @override
+  bool updateShouldNotify(oldWidget) => this == oldWidget;
+}
+
+/// Provides [auth] accessible via [getAuth] to [child]'s [Widget] tree.
+Widget provideAuth(Auth auth, Widget child) {
+  return _AuthModel(
+    auth: auth,
+    child: child,
+  );
+}
+
+/// Returns the [Auth] service provides at the widget tree of [context].
+Auth getAuth(BuildContext context) {
+  final model = context.inheritFromWidgetOfExactType(_AuthModel);
+  return (model as _AuthModel).auth;
+}
+
+class _AuthModel extends InheritedWidget {
+  final Auth auth;
+
+  const _AuthModel({
+    @required this.auth,
+    @required Widget child,
+  }) : super(child: child);
+
+  @override
+  bool operator ==(Object o) => o is _AuthModel && auth == o.auth;
+
+  @override
+  int get hashCode => auth.hashCode;
 
   @override
   bool updateShouldNotify(oldWidget) => this == oldWidget;

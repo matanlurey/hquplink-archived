@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/pages.dart';
 import 'package:hquplink/services.dart';
@@ -73,7 +74,51 @@ class _AppShellState extends State<AppShell> {
   }
 
   @override
-  build(_) {
+  build(context) {
+    final auth = getAuth(context);
+    Widget userAccountHeader;
+    if (auth.isSignedIn) {
+      userAccountHeader = Builder(
+        builder: (context) {
+          return UserAccountsDrawerHeader(
+            currentAccountPicture: InkWell(
+              child: GoogleUserCircleAvatar(
+                identity: auth.identity,
+              ),
+              onTap: () async {
+                if (await showConfirmDialog(
+                      context: context,
+                      title: 'Sign Out',
+                      discardText: 'Sign Out',
+                    ) ==
+                    true) {
+                  await auth.signOut();
+                  setState(() {});
+                }
+              },
+            ),
+            accountEmail: Text(auth.identity.email),
+            accountName: Text(auth.identity.displayName),
+          );
+        },
+      );
+    } else {
+      userAccountHeader = UserAccountsDrawerHeader(
+        accountEmail: Center(
+          child: FlatButton.icon(
+            icon: const Icon(Icons.person),
+            label: const Text('Sign in with Google'),
+            onPressed: () async {
+              await auth.signIn();
+              setState(() {
+                // Notify that 'auth' may have changed.
+              });
+            },
+          ),
+        ),
+        accountName: Container(),
+      );
+    }
     return MaterialApp(
       title: 'HQ Uplink',
       theme: theme,
@@ -93,12 +138,7 @@ class _AppShellState extends State<AppShell> {
         drawer: Drawer(
           child: ListView(
             children: [
-              DrawerHeader(
-                child: Wrap(),
-                decoration: BoxDecoration(
-                  color: theme.primaryColor,
-                ),
-              ),
+              userAccountHeader,
               Builder(
                 builder: (context) {
                   return ListTile(

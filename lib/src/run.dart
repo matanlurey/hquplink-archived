@@ -1,7 +1,9 @@
 // ignore_for_file: parameter_assignments
 
 import 'package:device_id/device_id.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/services.dart';
 import 'package:package_info/package_info.dart';
@@ -22,6 +24,7 @@ Future<T> _resolve<T>(T resultOrNull, Future<T> Function() getResult) {
 /// May optionally provide different settings for executing.
 void run({
   bool debugMode,
+  Auth auth,
   String deviceId,
   PackageInfo packageInfo,
   JsonStorage storage,
@@ -32,6 +35,12 @@ void run({
     debugMode = false;
     assert(debugMode = true);
   }
+
+  // Default to not logged in.
+  auth ??= Auth(
+    firebaseAuth: FirebaseAuth.instance,
+    googleSignIn: GoogleSignIn(),
+  );
 
   // Resolve missing service classes in parallel as much as possible.
   await Future.wait(<Future<Object>>[
@@ -47,8 +56,7 @@ void run({
         await SharedPreferences.getInstance(),
       );
     }),
-  ], eagerError: true)
-      .then((results) {
+  ]).then((results) {
     setDeviceId(results[0] as String);
     packageInfo = results[1] as PackageInfo;
     storage = results[2] as JsonStorage;
@@ -66,20 +74,23 @@ void run({
   runApp(
     provideSettings(
       settings,
-      provideStorage(
-        storage,
-        provideCatalog(
-          Catalog.builtIn,
-          AppShell(
-            appVersion: appVersion,
-            initialRoster: await _loadRosterOrRecover(storage),
-            onRosterUpdated: (roster) async {
-              await storage.saveJson(
-                roster,
-                Roster.serializer,
-                'roster.json',
-              );
-            },
+      provideAuth(
+        auth,
+        provideStorage(
+          storage,
+          provideCatalog(
+            Catalog.builtIn,
+            AppShell(
+              appVersion: appVersion,
+              initialRoster: await _loadRosterOrRecover(storage),
+              onRosterUpdated: (roster) async {
+                await storage.saveJson(
+                  roster,
+                  Roster.serializer,
+                  'roster.json',
+                );
+              },
+            ),
           ),
         ),
       ),
