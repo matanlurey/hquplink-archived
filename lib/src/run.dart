@@ -1,10 +1,8 @@
 // ignore_for_file: parameter_assignments
 
 import 'package:device_id/device_id.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/services.dart';
 import 'package:package_info/package_info.dart';
@@ -38,7 +36,7 @@ void run({
   }
 
   // Default to not logged in and not supported.
-  auth ??= Auth.disabled();
+  auth ??= Auth.disabled;
 
   // Resolve missing service classes in parallel as much as possible.
   await Future.wait(<Future<Object>>[

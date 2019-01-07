@@ -5,10 +5,11 @@ import 'package:hquplink/services.dart';
 import 'src/run.dart';
 
 /// Enables features that are not yet stable for release.
-void main() {
+void main() async {
   return run(
-      auth: Auth(
-    firebaseAuth: FirebaseAuth.instance,
-    googleSignIn: GoogleSignIn(),
-  ));
+    auth: await Auth.create(
+      firebaseAuth: FirebaseAuth.instance,
+      googleSignIn: GoogleSignIn(),
+    ),
+  );
 }
