@@ -5,6 +5,9 @@ import 'package:hquplink/pages.dart';
 import 'package:hquplink/services.dart';
 import 'package:hquplink/widgets.dart';
 
+/// TODO: Make configurable.
+const _isDevMode = !const bool.fromEnvironment('dart.vm.product');
+
 /// Represents the application shell for HQ Uplink.
 class AppShell extends StatefulWidget {
   static ThemeData _buildDefaultTheme() {
@@ -140,6 +143,27 @@ class _AppShellState extends State<AppShell> {
           child: ListView(
             children: [
               userAccountHeader,
+              _isDevMode
+                  ? Builder(
+                      builder: (context) {
+                        return ListTile(
+                          title: const Text('Developer'),
+                          leading: const Icon(Icons.lock_open),
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push<void>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) {
+                                  return const DeveloperPage();
+                                },
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    )
+                  : Container(),
               Builder(
                 builder: (context) {
                   return ListTile(
