@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hquplink/models.dart';
 import 'package:hquplink/pages.dart';
 import 'package:hquplink/services.dart';
@@ -82,8 +81,8 @@ class _AppShellState extends State<AppShell> {
         builder: (context) {
           return UserAccountsDrawerHeader(
             currentAccountPicture: InkWell(
-              child: GoogleUserCircleAvatar(
-                identity: auth.identity,
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(auth.current.photoUrl),
               ),
               onTap: () async {
                 if (await showConfirmDialog(
@@ -97,8 +96,8 @@ class _AppShellState extends State<AppShell> {
                 }
               },
             ),
-            accountEmail: Text(auth.identity.email),
-            accountName: Text(auth.identity.displayName),
+            accountEmail: Text(auth.current.emailAddress),
+            accountName: Text(auth.current.displayName),
           );
         },
       );
